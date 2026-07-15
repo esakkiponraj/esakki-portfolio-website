@@ -10,6 +10,19 @@ export const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+// Media URLs coming from the CMS are normally absolute Cloudinary URLs.
+// If the backend's local-upload fallback is ever used instead, it returns
+// a relative "/uploads/..." path, which 404s if used as-is on the frontend's
+// own origin. This resolves it against the backend's origin so it always
+// points at the server that actually has the file.
+const API_ORIGIN = API_BASE.replace(/\/api\/?$/, '');
+
+export function resolveMediaUrl(url?: string): string | undefined {
+  if (!url) return url;
+  if (/^(https?:)?\/\//i.test(url) || url.startsWith('data:')) return url;
+  return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
+}
+
 export interface ContactPayload {
   name: string;
   email: string;

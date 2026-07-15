@@ -47,7 +47,14 @@ export default function ProfilePhoto({ src, alt, className = '' }: Props) {
         style={{ rotateX, rotateY }}
         className="relative rounded-3xl overflow-hidden border-2 border-fg/10 shadow-xl bg-card aspect-[4/5]"
       >
-        <img src={src} alt={alt} className="w-full h-full object-cover" />
+        <img
+          src={src}
+          alt={alt}
+          className="w-full h-full object-cover"
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+        />
 
         {/* Light sweep that follows the cursor across the photo */}
         <motion.div

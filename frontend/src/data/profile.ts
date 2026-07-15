@@ -5,6 +5,12 @@
 // admin CMS backend — see backend/README.md)
 // ============================================================
 
+// Imported (not referenced as a raw "/src/..." string) so Vite bundles,
+// hashes, and cache-optimizes it correctly in production builds — this
+// is what lets the photo render instantly on first paint instead of
+// depending entirely on the backend profile fetch to complete first.
+import profilePhoto from '../assets/profile.jpg';
+
 export const personalInfo = {
   name: "Esakki Ponraj M",
   title: "Full Stack Developer",
@@ -20,7 +26,7 @@ export const personalInfo = {
   status: "Available For Work",
   summary:
     "Full Stack Developer with practical experience in Next.js, React.js, Node.js, PostgreSQL, and MongoDB. Proficient in developing scalable web applications, RESTful APIs, and responsive user interfaces. Experienced in collaborating within agile teams, following best practices in code quality, version control, and agile methodologies to deliver reliable, high-quality solutions.",
-  photo: "/src/assets/profile.jpg",
+  photo: profilePhoto,
   resumeUrl: "/resume.pdf",
   socials: {
     github: "#", // TODO: add your GitHub profile URL
@@ -104,7 +110,9 @@ export const projects: {
   description: string;
   technologies: string[];
   features: string[];
+  image?: string;
   link?: string;
+  githubLink?: string;
   category: ProjectCategory[];
 }[] = [
   {

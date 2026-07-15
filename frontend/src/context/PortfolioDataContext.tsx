@@ -3,6 +3,7 @@ import {
   fetchProfile, fetchContactInfo, fetchProjects, fetchSkills,
   fetchEducation, fetchExperience, fetchAchievements, fetchCertificates, fetchSocialLinks,
 } from '../services/publicApi';
+import { resolveMediaUrl } from '../services/api';
 import {
   personalInfo as staticPersonalInfo,
   stats as staticStats,
@@ -60,13 +61,16 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
   const loadAll = useCallback(async () => {
     setLoading(true);
 
-    const [
-      profileRes, contactInfoRes, projectsRes, skillsRes,
-      educationRes, experienceRes, achievementsRes, certificatesRes, socialLinksRes,
-    ] = await Promise.allSettled([
-      fetchProfile(), fetchContactInfo(), fetchProjects(), fetchSkills(),
-      fetchEducation(), fetchExperience(), fetchAchievements(), fetchCertificates(), fetchSocialLinks(),
+    // Fired together so every request starts immediately, but awaited in two
+    // groups: the profile-critical group (drives the hero photo/name/etc.)
+    // is applied the moment it resolves, instead of being held back until
+    // every other CMS collection below also finishes loading.
+    const profileGroup = Promise.allSettled([fetchProfile(), fetchContactInfo(), fetchSocialLinks()]);
+    const restGroup = Promise.allSettled([
+      fetchProjects(), fetchSkills(), fetchEducation(), fetchExperience(), fetchAchievements(), fetchCertificates(),
     ]);
+
+    const [profileRes, contactInfoRes, socialLinksRes] = await profileGroup;
 
     // Social links (needed to build personalInfo.socials below)
     let socials = staticPersonalInfo.socials;
@@ -93,7 +97,7 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
         phone: contact?.phone || p.phone || staticPersonalInfo.phone,
         location: contact?.address || p.location || staticPersonalInfo.location,
         status: p.status || staticPersonalInfo.status,
-        photo: p.photoUrl || staticPersonalInfo.photo,
+        photo: resolveMediaUrl(p.photoUrl) || staticPersonalInfo.photo,
         resumeUrl: p.resumeUrl || staticPersonalInfo.resumeUrl,
         socials,
       });
@@ -110,6 +114,10 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
       });
     }
 
+    const [
+      projectsRes, skillsRes, educationRes, experienceRes, achievementsRes, certificatesRes,
+    ] = await restGroup;
+
     if (projectsRes.status === 'fulfilled' && projectsRes.value.length > 0) {
       setProjects(
         projectsRes.value.map((p: any) => ({
@@ -117,7 +125,9 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
           description: p.description,
           technologies: p.technologies || [],
           features: p.features || [],
+          image: resolveMediaUrl(p.imageUrl),
           link: p.liveLink || undefined,
+          githubLink: p.githubLink || undefined,
           category: (p.category?.length ? p.category : ['fullstack']) as ProjectCategory[],
         }))
       );
