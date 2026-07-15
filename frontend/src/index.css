@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dark theme (default) — RGB triples so Tailwind's <alpha-value> opacity modifiers work */
+  --color-bg: 5 8 22;        /* #050816 */
+  --color-card: 15 23 42;    /* #0F172A */
+  --color-fg: 255 255 255;   /* white text/borders */
+}
+
+.light {
+  --color-bg: 244 247 251;   /* soft off-white */
+  --color-card: 255 255 255; /* white cards */
+  --color-fg: 10 15 30;      /* near-black text/borders */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: rgb(var(--color-bg));
+  color: rgb(var(--color-fg));
+  font-family: 'Inter', sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgb(var(--color-bg));
+}
+::-webkit-scrollbar-thumb {
+  background: #1e3a8a;
+  border-radius: 4px;
+}
+
+@layer components {
+  .glass {
+    @apply bg-card/60 backdrop-blur-xl border border-fg/10;
+  }
+  .glow-border {
+    @apply border border-primary/30 hover:border-accent/60 transition-colors duration-300;
+  }
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
+  }
+  .section-container {
+    @apply max-w-6xl mx-auto px-6 md:px-10 py-20;
+  }
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary hover:bg-blue-600 text-white font-medium transition-all duration-300 shadow-glow hover:shadow-glowCyan;
+  }
+  .btn-outline {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-full border border-fg/20 hover:border-accent/60 text-fg font-medium transition-all duration-300 hover:bg-fg/5;
+  }
+}
+
+.grid-pattern {
+  background-image:
+    linear-gradient(to right, rgb(var(--color-fg) / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(var(--color-fg) / 0.07) 1px, transparent 1px);
+  background-size: 56px 56px;
+  animation: gridDrift 22s linear infinite;
+}
+.grid-fade {
+  background: radial-gradient(ellipse 65% 55% at 50% 0%, transparent 0%, rgb(var(--color-bg)) 78%);
+}
+@keyframes gridDrift {
+  0% { background-position: 0 0; }
+  100% { background-position: 56px 56px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
