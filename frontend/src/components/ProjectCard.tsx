@@ -7,6 +7,10 @@ interface Props {
   description: string;
   technologies: string[];
   features: string[];
+<<<<<<< HEAD
+  image?: string;
+=======
+<<<<<<< HEAD
   image?: string;
   link?: string;
   githubLink?: string;
@@ -14,6 +18,19 @@ interface Props {
 }
 
 export default function ProjectCard({ name, description, technologies, features, image, link, githubLink, delay = 0 }: Props) {
+=======
+>>>>>>> d465a6a159ba0fe478be52a34138d893b4e6d2cc
+  link?: string;
+  githubLink?: string;
+  delay?: number;
+}
+
+<<<<<<< HEAD
+export default function ProjectCard({ name, description, technologies, features, image, link, githubLink, delay = 0 }: Props) {
+=======
+export default function ProjectCard({ name, description, technologies, features, link, delay = 0 }: Props) {
+>>>>>>> b88448106517b65e870144745704448afacf9667
+>>>>>>> d465a6a159ba0fe478be52a34138d893b4e6d2cc
   // Mouse-driven tilt: rotates gently toward the cursor position within the card.
   const px = useMotionValue(0.5);
   const py = useMotionValue(0.5);
@@ -45,6 +62,10 @@ export default function ProjectCard({ name, description, technologies, features,
       style={{ rotateX, rotateY, transformPerspective: 800 }}
       className="glass glow-border rounded-2xl p-6 flex flex-col h-full hover:shadow-glow transition-shadow duration-300"
     >
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> d465a6a159ba0fe478be52a34138d893b4e6d2cc
       {image && (
         <div className="-mx-6 -mt-6 mb-4 h-40 overflow-hidden rounded-t-2xl">
           <img
@@ -57,6 +78,11 @@ export default function ProjectCard({ name, description, technologies, features,
         </div>
       )}
 
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> b88448106517b65e870144745704448afacf9667
+>>>>>>> d465a6a159ba0fe478be52a34138d893b4e6d2cc
       <h3 className="text-xl font-display font-semibold mb-2">{name}</h3>
       <p className="text-fg/70 text-sm mb-4">{description}</p>
 
@@ -80,6 +106,10 @@ export default function ProjectCard({ name, description, technologies, features,
         ))}
       </div>
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> d465a6a159ba0fe478be52a34138d893b4e6d2cc
       {(link || githubLink) && (
         <div className="flex flex-wrap items-center gap-4">
           {link && (
@@ -103,6 +133,20 @@ export default function ProjectCard({ name, description, technologies, features,
             </a>
           )}
         </div>
+<<<<<<< HEAD
+=======
+=======
+      {link && (
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-sm text-accent hover:text-fg transition-colors"
+        >
+          <FiExternalLink /> Visit Live Site
+        </a>
+>>>>>>> b88448106517b65e870144745704448afacf9667
+>>>>>>> d465a6a159ba0fe478be52a34138d893b4e6d2cc
       )}
     </motion.div>
   );
