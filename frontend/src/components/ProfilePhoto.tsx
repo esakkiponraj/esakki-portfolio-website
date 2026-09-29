@@ -39,18 +39,11 @@ export default function ProfilePhoto({ src, alt, className = '' }: Props) {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Slow ambient glow behind the frame — subtle, not a halo */}
-      <div className="absolute -inset-3 md:-inset-4 rounded-[1.75rem] bg-gradient-to-br from-primary/25 via-secondary/15 to-transparent animate-glow" />
-
       {/* The photo box itself — tilts toward the cursor */}
       <motion.div
         style={{ rotateX, rotateY }}
-        className="relative rounded-3xl overflow-hidden border-2 border-fg/10 shadow-xl bg-card aspect-[4/5]"
+        className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-lg bg-slate-100 aspect-[4/5]"
       >
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> d465a6a159ba0fe478be52a34138d893b4e6d2cc
         <img
           src={src}
           alt={alt}
@@ -59,23 +52,17 @@ export default function ProfilePhoto({ src, alt, className = '' }: Props) {
           decoding="async"
           fetchPriority="high"
         />
-<<<<<<< HEAD
-=======
-=======
-        <img src={src} alt={alt} className="w-full h-full object-cover" />
->>>>>>> b88448106517b65e870144745704448afacf9667
->>>>>>> d465a6a159ba0fe478be52a34138d893b4e6d2cc
 
         {/* Light sweep that follows the cursor across the photo */}
         <motion.div
-          className="pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          className="pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/15 to-transparent"
           style={{ left: shineX }}
         />
       </motion.div>
 
-      {/* Static corner accents — a framed look, no motion */}
-      <span className="absolute -top-2 -left-2 w-8 h-8 border-t-4 border-l-4 border-primary rounded-tl-2xl" />
-      <span className="absolute -bottom-2 -right-2 w-8 h-8 border-b-4 border-r-4 border-secondary rounded-br-2xl" />
+      {/* Thin accent corner brackets */}
+      <span className="absolute -top-2 -left-2 w-7 h-7 border-t-2 border-l-2 border-slate-700 rounded-tl-lg" />
+      <span className="absolute -bottom-2 -right-2 w-7 h-7 border-b-2 border-r-2 border-slate-400 rounded-br-lg" />
     </div>
   );
 }

@@ -1,16 +1,20 @@
-import { motion } from 'framer-motion';
+import './homepage.css';
 import { NavLink } from 'react-router-dom';
-import { FiDownload, FiArrowRight, FiGithub, FiLinkedin, FiMail } from 'react-icons/fi';
+import { FiDownload, FiArrowRight, FiGithub, FiLinkedin, FiMail, FiMenu, FiX } from 'react-icons/fi';
+import {
+  FaReact, FaNodeJs, FaDatabase, FaGitAlt, FaHtml5, FaCss3Alt,
+} from 'react-icons/fa';
+import {
+  SiNextdotjs, SiMongodb, SiPostgresql, SiExpress, SiTailwindcss, SiJavascript, SiTypescript,
+} from 'react-icons/si';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import ProfilePhoto from '../components/ProfilePhoto';
-import SectionHeading from '../components/SectionHeading';
-import AnimatedCounter from '../components/AnimatedCounter';
-import GlassCard from '../components/GlassCard';
-import ProjectCard from '../components/ProjectCard';
 import { services } from '../data/profile';
 import { usePortfolioData } from '../context/PortfolioDataContext';
+import ProfilePhoto from '../components/ProfilePhoto';
 
-function useTypingEffect(words: string[], speed = 90, pause = 1400) {
+/* ─── Typing effect ─────────────────────────────────────────── */
+function useTypingEffect(words: string[], speed = 80, pause = 1600) {
   const [text, setText] = useState('');
   const [wordIndex, setWordIndex] = useState(0);
   const [deleting, setDeleting] = useState(false);
@@ -37,115 +41,538 @@ function useTypingEffect(words: string[], speed = 90, pause = 1400) {
   return text;
 }
 
+/* ─── Animated stat counter ─────────────────────────────────── */
+function AnimatedStat({ value, suffix }: { value: number; suffix: string }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const duration = 1200;
+    const step = Math.ceil(value / (duration / 16));
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= value) {
+        setCount(value);
+        clearInterval(timer);
+      } else {
+        setCount(start);
+      }
+    }, 16);
+    return () => clearInterval(timer);
+  }, [value]);
+
+  return <>{count}{suffix}</>;
+}
+
+/* ─── Tech strip items ─────────────────────────────────────── */
+const TECH_ITEMS = [
+  { label: 'React.js', Icon: FaReact },
+  { label: 'Next.js', Icon: SiNextdotjs },
+  { label: 'JavaScript', Icon: SiJavascript },
+  { label: 'TypeScript', Icon: SiTypescript },
+  { label: 'Node.js', Icon: FaNodeJs },
+  { label: 'Express.js', Icon: SiExpress },
+  { label: 'MongoDB', Icon: SiMongodb },
+  { label: 'PostgreSQL', Icon: SiPostgresql },
+  { label: 'Tailwind CSS', Icon: SiTailwindcss },
+  { label: 'HTML5', Icon: FaHtml5 },
+  { label: 'CSS3', Icon: FaCss3Alt },
+  { label: 'Git', Icon: FaGitAlt },
+];
+
+/* ─── Nav links ─────────────────────────────────────────────── */
+const NAV_LINKS = [
+  { to: '/', label: 'Home', end: true },
+  { to: '/about', label: 'About', end: false },
+  { to: '/skills', label: 'Skills', end: false },
+  { to: '/projects', label: 'Projects', end: false },
+  { to: '/certificates', label: 'Certificates', end: false },
+  { to: '/education', label: 'Education', end: false },
+  { to: '/experience', label: 'Experience', end: false },
+  { to: '/contact', label: 'Contact', end: false },
+];
+
+/* ─── Section heading ───────────────────────────────────────── */
+function HPHeading({ eyebrow, title, center = true }: { eyebrow: string; title: string; center?: boolean }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      className={`hp-heading-wrap ${center ? 'center' : ''}`}
+    >
+      <span className="hp-eyebrow">{eyebrow}</span>
+      <h2 className="hp-heading">{title}</h2>
+      <hr className="hp-rule" />
+    </motion.div>
+  );
+}
+
+/* ─── SERVICE ICON MAP ──────────────────────────────────────── */
+const SERVICE_ICONS: Record<string, React.ReactNode> = {
+  'Frontend Development': <FaReact />,
+  'Backend Development': <FaNodeJs />,
+  'REST APIs': <FaDatabase />,
+  'Database Design': <SiMongodb />,
+  'Responsive UI Design': <SiTailwindcss />,
+  'Performance Optimization': <FaGitAlt />,
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   HOME PAGE
+═══════════════════════════════════════════════════════════════ */
 export default function Home() {
-  const { personalInfo, stats, projects } = usePortfolioData();
+  const { personalInfo, stats, projects, skillCategories, loading } = usePortfolioData();
   const typed = useTypingEffect(personalInfo.taglines);
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 16);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const featuredProjects = projects.filter((p) => p.category.includes('featured'));
+
+  /* Derive a flat skill list for the tech strip; fall back to TECH_ITEMS when loading */
+  const allSkillNames = skillCategories.flatMap((cat) => cat.skills.map((s) => s.name));
 
   return (
-    <div>
-      {/* HERO */}
-      <section className="section-container grid lg:grid-cols-2 gap-12 items-center min-h-[85vh]">
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <p className="font-mono text-accent mb-4">Hi, my name is</p>
-          <h1 className="text-4xl md:text-6xl font-display font-bold leading-tight mb-4">
-            {personalInfo.name}
-          </h1>
-          <div className="text-xl md:text-2xl text-fg/70 h-8 mb-6 font-mono">
-            {typed}
-            <span className="animate-pulse text-accent">|</span>
-          </div>
-          <p className="text-fg/60 max-w-lg mb-8 leading-relaxed">{personalInfo.summary}</p>
+    <div className="hp-root">
+      {/* ── NAVBAR ─────────────────────────────────────────────── */}
+      <nav className={`hp-nav${scrolled ? ' scrolled' : ''}`}>
+        <div className="hp-nav-inner">
+          <NavLink to="/" className="hp-nav-logo">
+            Esakki<span>.</span>
+          </NavLink>
 
-          <div className="flex flex-wrap gap-4">
-            <a href={personalInfo.resumeUrl} download className="btn-primary">
-              <FiDownload /> Download Resume
+          <ul className="hp-nav-links">
+            {NAV_LINKS.map((l) => (
+              <li key={l.to}>
+                <NavLink
+                  to={l.to}
+                  end={l.end}
+                  className={({ isActive }) => `hp-nav-link${isActive ? ' active' : ''}`}
+                >
+                  {l.label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+
+          <div className="hp-nav-actions">
+            <a
+              href={personalInfo.resumeUrl}
+              download
+              id="nav-resume-download"
+              className="hp-btn-ghost"
+            >
+              <FiDownload size={13} /> Resume
             </a>
-            <NavLink to="/contact" className="btn-outline">
+            <NavLink to="/contact" className="hp-btn-solid" id="nav-hire-me">
               Hire Me
             </NavLink>
-            <NavLink to="/projects" className="btn-outline">
-              View Projects <FiArrowRight />
-            </NavLink>
           </div>
 
-          <div className="flex gap-4 mt-8">
-            <a href={personalInfo.socials.github} target="_blank" rel="noopener noreferrer" className="p-3 rounded-full glass hover:text-accent transition-colors" aria-label="GitHub"><FiGithub /></a>
-            <a href={personalInfo.socials.linkedin} target="_blank" rel="noopener noreferrer" className="p-3 rounded-full glass hover:text-accent transition-colors" aria-label="LinkedIn"><FiLinkedin /></a>
-            <a href={personalInfo.socials.email} className="p-3 rounded-full glass hover:text-accent transition-colors" aria-label="Email"><FiMail /></a>
-          </div>
-        </motion.div>
+          <button
+            className="hp-nav-hamburger"
+            onClick={() => setMobileOpen((o) => !o)}
+            aria-label="Toggle mobile menu"
+            id="nav-mobile-toggle"
+          >
+            {mobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+          </button>
+        </div>
 
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.2 }}>
-          <ProfilePhoto src={personalInfo.photo} alt={personalInfo.name} className="w-64 sm:w-72 md:w-80 mx-auto" />
-        </motion.div>
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className={`hp-nav-mobile open`}
+            >
+              {NAV_LINKS.map((l) => (
+                <NavLink
+                  key={l.to}
+                  to={l.to}
+                  end={l.end}
+                  onClick={() => setMobileOpen(false)}
+                  className={({ isActive }) => `hp-nav-mobile-link${isActive ? ' active' : ''}`}
+                >
+                  {l.label}
+                </NavLink>
+              ))}
+              <a
+                href={personalInfo.resumeUrl}
+                download
+                className="hp-cta-secondary"
+                style={{ marginTop: '0.5rem', justifyContent: 'center' }}
+              >
+                <FiDownload size={13} /> Download Resume
+              </a>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
+
+      {/* ── HERO ───────────────────────────────────────────────── */}
+      <section className="hp-hero" aria-label="Introduction">
+        <div className="hp-hero-grid">
+          {/* LEFT: text */}
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55 }}
+          >
+            {personalInfo.status && (
+              <div className="hp-hero-badge">
+                <span className="hp-hero-badge-dot" />
+                {personalInfo.status}
+              </div>
+            )}
+
+            <h1 className="hp-hero-name" id="hero-name">
+              {loading ? (
+                <span className="hp-skeleton" style={{ display: 'block', height: '3.4rem', width: '80%' }} />
+              ) : (
+                personalInfo.name
+              )}
+            </h1>
+
+            <p className="hp-hero-role" id="hero-role">
+              {typed}
+              <span className="hp-hero-cursor" aria-hidden="true" />
+            </p>
+
+            <p className="hp-hero-summary" id="hero-summary">
+              {loading ? (
+                <>
+                  <span className="hp-skeleton" style={{ display: 'block', height: '1rem', marginBottom: '0.4rem' }} />
+                  <span className="hp-skeleton" style={{ display: 'block', height: '1rem', width: '90%', marginBottom: '0.4rem' }} />
+                  <span className="hp-skeleton" style={{ display: 'block', height: '1rem', width: '75%' }} />
+                </>
+              ) : (
+                personalInfo.summary
+              )}
+            </p>
+
+            <div className="hp-hero-cta">
+              <NavLink to="/projects" className="hp-cta-primary" id="hero-view-projects">
+                View Projects <FiArrowRight size={14} />
+              </NavLink>
+              <a
+                href={personalInfo.resumeUrl}
+                download
+                className="hp-cta-secondary"
+                id="hero-download-resume"
+              >
+                <FiDownload size={14} /> Download Resume
+              </a>
+            </div>
+
+            <div className="hp-hero-socials">
+              {personalInfo.socials.github && personalInfo.socials.github !== '#' && (
+                <a
+                  href={personalInfo.socials.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hp-social-link"
+                  aria-label="GitHub profile"
+                >
+                  <FiGithub size={17} />
+                </a>
+              )}
+              {personalInfo.socials.linkedin && personalInfo.socials.linkedin !== '#' && (
+                <a
+                  href={personalInfo.socials.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hp-social-link"
+                  aria-label="LinkedIn profile"
+                >
+                  <FiLinkedin size={17} />
+                </a>
+              )}
+              {personalInfo.socials.email && (
+                <a
+                  href={personalInfo.socials.email}
+                  className="hp-social-link"
+                  aria-label="Send email"
+                >
+                  <FiMail size={17} />
+                </a>
+              )}
+            </div>
+          </motion.div>
+
+          {/* RIGHT: photo */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="hp-hero-photo-wrap"
+          >
+            <div className="hp-hero-photo-inner">
+              <ProfilePhoto
+                src={personalInfo.photo}
+                alt={`${personalInfo.name} profile photo`}
+                className="w-full"
+              />
+              {/* floating status card */}
+              <div className="hp-hero-float-card">
+                <span className="hp-hero-badge-dot" />
+                Available for opportunities
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
-      {/* STATS */}
-      <section className="section-container">
-        <div className="glass rounded-3xl p-10 grid grid-cols-2 md:grid-cols-4 gap-8">
+      {/* ── TECH STRIP ─────────────────────────────────────────── */}
+      <div className="hp-tech-strip-wrapper">
+        <p className="hp-tech-strip-label">Technologies I work with</p>
+        <div className="hp-tech-strip">
+          {TECH_ITEMS.map(({ label, Icon }) => (
+            <motion.span
+              key={label}
+              className="hp-tech-pill"
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3 }}
+            >
+              <Icon />
+              {label}
+            </motion.span>
+          ))}
+        </div>
+      </div>
+
+      {/* ── STATS ──────────────────────────────────────────────── */}
+      <div className="hp-section">
+        <motion.div
+          className="hp-stats-grid"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
           {stats.map((s) => (
-            <AnimatedCounter key={s.label} value={s.value} suffix={s.suffix} label={s.label} />
+            <div key={s.label} className="hp-stat-item">
+              <div className="hp-stat-value">
+                <AnimatedStat value={s.value} suffix={s.suffix} />
+              </div>
+              <div className="hp-stat-label">{s.label}</div>
+            </div>
           ))}
-        </div>
-      </section>
+        </motion.div>
+      </div>
 
-      {/* SERVICES */}
-      <section className="section-container">
-        <SectionHeading eyebrow="What I Do" title="Services" />
-        <div className="grid md:grid-cols-3 gap-6">
-          {services.map((s, i) => (
-            <GlassCard key={s.title} delay={i * 0.1}>
-              <h3 className="font-display font-semibold text-lg mb-2">{s.title}</h3>
-              <p className="text-fg/60 text-sm">{s.description}</p>
-            </GlassCard>
-          ))}
+      {/* ── SERVICES ───────────────────────────────────────────── */}
+      <div className="hp-section-alt-wrapper">
+        <div className="hp-section">
+          <HPHeading eyebrow="What I Do" title="Services" />
+          <div className="hp-services-grid">
+            {services.map((s, i) => (
+              <motion.div
+                key={s.title}
+                className="hp-service-card"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+              >
+                <div className="hp-service-icon">
+                  {SERVICE_ICONS[s.title] ?? <FaReact />}
+                </div>
+                <h3 className="hp-service-title">{s.title}</h3>
+                <p className="hp-service-desc">{s.description}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </section>
+      </div>
 
-      {/* FEATURED PROJECTS */}
-      <section className="section-container">
-        <SectionHeading eyebrow="Recent Work" title="Featured Projects" />
-        <div className="grid md:grid-cols-3 gap-6">
-          {projects.filter((p) => p.category.includes('featured')).map((p, i) => (
-            <ProjectCard key={p.name} {...p} delay={i * 0.1} />
-          ))}
-        </div>
-        <div className="text-center mt-10">
-          <NavLink to="/projects" className="btn-outline">
-            View All Projects <FiArrowRight />
+      {/* ── FEATURED PROJECTS ──────────────────────────────────── */}
+      <div className="hp-section">
+        <HPHeading eyebrow="Recent Work" title="Featured Projects" />
+        {loading ? (
+          <div className="hp-projects-grid">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="hp-project-card">
+                <div className="hp-skeleton" style={{ height: '180px' }} />
+                <div className="hp-project-body">
+                  <div className="hp-skeleton" style={{ height: '1rem', marginBottom: '0.5rem' }} />
+                  <div className="hp-skeleton" style={{ height: '0.875rem', width: '80%', marginBottom: '0.5rem' }} />
+                  <div className="hp-skeleton" style={{ height: '0.875rem', width: '60%' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : featuredProjects.length > 0 ? (
+          <div className="hp-projects-grid">
+            {featuredProjects.map((p, i) => (
+              /* ProjectCard now uses hp-* classes internally */
+              <motion.div
+                key={p.name}
+                className="hp-project-card"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: i * 0.1 }}
+              >
+                {p.image ? (
+                  <div className="hp-project-img">
+                    <img src={p.image} alt={`${p.name} preview`} loading="lazy" decoding="async" />
+                  </div>
+                ) : (
+                  <div className="hp-project-img-fallback">
+                    <span className="hp-project-img-fallback-icon">{'</>'}</span>
+                  </div>
+                )}
+                <div className="hp-project-body">
+                  <h3 className="hp-project-title">{p.name}</h3>
+                  <p className="hp-project-desc">{p.description}</p>
+                  <div className="hp-project-tags">
+                    {p.technologies.map((t) => (
+                      <span key={t} className="hp-project-tag">{t}</span>
+                    ))}
+                  </div>
+                  {(p.link || p.githubLink) && (
+                    <div className="hp-project-links">
+                      {p.link && (
+                        <a href={p.link} target="_blank" rel="noopener noreferrer" className="hp-project-link">
+                          <FiArrowRight size={13} /> Visit Site
+                        </a>
+                      )}
+                      {p.githubLink && (
+                        <a href={p.githubLink} target="_blank" rel="noopener noreferrer" className="hp-project-link">
+                          <FiGithub size={13} /> Code
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <p style={{ textAlign: 'center', color: '#6B7480' }}>No featured projects yet.</p>
+        )}
+
+        <div className="hp-view-all-wrap">
+          <NavLink to="/projects" className="hp-cta-secondary" id="home-view-all-projects">
+            View All Projects <FiArrowRight size={14} />
           </NavLink>
         </div>
-      </section>
+      </div>
 
-      {/* WHY HIRE ME */}
-      <section className="section-container">
-        <SectionHeading eyebrow="Why Work With Me" title="Why Hire Me" />
-        <div className="grid md:grid-cols-3 gap-6">
-          <GlassCard>
-            <h3 className="font-display font-semibold mb-2">Real Internship Experience</h3>
-            <p className="text-fg/60 text-sm">Four full-stack internships across MERN and Next.js/PostgreSQL stacks, working in real Agile teams.</p>
-          </GlassCard>
-          <GlassCard delay={0.1}>
-            <h3 className="font-display font-semibold mb-2">End-to-End Ownership</h3>
-            <p className="text-fg/60 text-sm">Comfortable across the stack — from responsive UIs to APIs to database design.</p>
-          </GlassCard>
-          <GlassCard delay={0.2}>
-            <h3 className="font-display font-semibold mb-2">Fast, Clear Communicator</h3>
-            <p className="text-fg/60 text-sm">Collaborates well in sprint planning and code reviews, with a focus on clean, maintainable code.</p>
-          </GlassCard>
+      {/* ── WHY HIRE ME ────────────────────────────────────────── */}
+      <div className="hp-section-alt-wrapper">
+        <div className="hp-section">
+          <HPHeading eyebrow="Why Work With Me" title="Why Hire Me" />
+          <div className="hp-why-grid">
+            {[
+              {
+                n: '01',
+                title: 'Real Internship Experience',
+                desc: 'Four full-stack internships across MERN and Next.js/PostgreSQL stacks, working in real Agile teams.',
+              },
+              {
+                n: '02',
+                title: 'End-to-End Ownership',
+                desc: 'Comfortable across the stack — from responsive UIs to REST APIs to database design and deployment.',
+              },
+              {
+                n: '03',
+                title: 'Fast, Clear Communicator',
+                desc: 'Collaborates well in sprint planning and code reviews, with a focus on clean, maintainable code.',
+              },
+            ].map((card, i) => (
+              <motion.div
+                key={card.n}
+                className="hp-why-card"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+              >
+                <div className="hp-why-num">{card.n}</div>
+                <h3 className="hp-why-title">{card.title}</h3>
+                <p className="hp-why-desc">{card.desc}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </section>
+      </div>
 
-      {/* CURRENT LEARNING */}
-      <section className="section-container pb-32">
-        <SectionHeading eyebrow="Always Growing" title="Currently Learning" />
-        <div className="glass rounded-2xl p-8 text-center max-w-2xl mx-auto">
-          <p className="text-fg/70">
-            Deepening expertise in system design, GraphQL, and cloud deployment — building on a foundation of
-            React, Next.js, Node.js, MongoDB, and PostgreSQL.
+      {/* ── CURRENTLY LEARNING ─────────────────────────────────── */}
+      <div className="hp-section">
+        <HPHeading eyebrow="Always Growing" title="Currently Learning" />
+        <motion.div
+          className="hp-learning-box"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <p className="hp-learning-text">
+            Deepening expertise in system design, GraphQL, and cloud deployment — building on a
+            strong foundation of React, Next.js, Node.js, MongoDB, and PostgreSQL.
           </p>
+        </motion.div>
+      </div>
+
+      {/* ── FOOTER ─────────────────────────────────────────────── */}
+      <footer className="hp-footer">
+        <div className="hp-footer-inner">
+          <div>
+            <p className="hp-footer-logo">Esakki<span>.</span></p>
+            <p className="hp-footer-tagline">
+              {personalInfo.title} building scalable, responsive web applications.
+            </p>
+          </div>
+
+          <div>
+            <p className="hp-footer-col-title">Quick Links</p>
+            <div className="hp-footer-links">
+              <NavLink to="/about" className="hp-footer-link">About</NavLink>
+              <NavLink to="/projects" className="hp-footer-link">Projects</NavLink>
+              <NavLink to="/skills" className="hp-footer-link">Skills</NavLink>
+              <NavLink to="/contact" className="hp-footer-link">Contact</NavLink>
+            </div>
+          </div>
+
+          <div>
+            <p className="hp-footer-col-title">Connect</p>
+            <div className="hp-footer-socials">
+              {personalInfo.socials.github && personalInfo.socials.github !== '#' && (
+                <a href={personalInfo.socials.github} target="_blank" rel="noopener noreferrer"
+                  className="hp-footer-social" aria-label="GitHub">
+                  <FiGithub size={16} />
+                </a>
+              )}
+              {personalInfo.socials.linkedin && personalInfo.socials.linkedin !== '#' && (
+                <a href={personalInfo.socials.linkedin} target="_blank" rel="noopener noreferrer"
+                  className="hp-footer-social" aria-label="LinkedIn">
+                  <FiLinkedin size={16} />
+                </a>
+              )}
+              {personalInfo.socials.email && (
+                <a href={personalInfo.socials.email} className="hp-footer-social" aria-label="Email">
+                  <FiMail size={16} />
+                </a>
+              )}
+            </div>
+          </div>
         </div>
-      </section>
+        <div className="hp-footer-bottom">
+          © {new Date().getFullYear()} Designed & Developed by {personalInfo.name}
+        </div>
+      </footer>
     </div>
   );
 }

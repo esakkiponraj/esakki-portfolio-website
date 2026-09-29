@@ -1,4 +1,5 @@
 import { useState, ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Navbar from '../components/Navbar';
@@ -21,6 +22,22 @@ const PARTICLE_COLORS = {
 export default function MainLayout({ children }: { children: ReactNode }) {
   const [hireMeOpen, setHireMeOpen] = useState(false);
   const { theme } = useTheme();
+  const location = useLocation();
+
+  // The public homepage has its own self-contained nav, footer, and background —
+  // skip the shared layout chrome so they don't stack on top of each other.
+  const isHomePage = location.pathname === '/';
+
+  if (isHomePage) {
+    return (
+      <>
+        <ScrollProgressBar />
+        {children}
+        <HireMeModal open={hireMeOpen} onClose={() => setHireMeOpen(false)} />
+        <ToastContainer theme="light" position="bottom-right" />
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-bgdark text-fg overflow-x-hidden relative">
