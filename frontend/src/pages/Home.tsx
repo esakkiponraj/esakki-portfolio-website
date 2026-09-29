@@ -351,15 +351,9 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── STATS ──────────────────────────────────────────────── */}
-      <div className="hp-section">
-        <motion.div
-          className="hp-stats-grid"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
+      {/* ── STATS BAND ─────────────────────────────────────────── */}
+      <div className="hp-stats-band">
+        <div className="hp-stats-grid">
           {stats.map((s) => (
             <div key={s.label} className="hp-stat-item">
               <div className="hp-stat-value">
@@ -368,11 +362,11 @@ export default function Home() {
               <div className="hp-stat-label">{s.label}</div>
             </div>
           ))}
-        </motion.div>
+        </div>
       </div>
 
       {/* ── SERVICES ───────────────────────────────────────────── */}
-      <div className="hp-section-alt-wrapper">
+      <div className="hp-services-wrapper">
         <div className="hp-section">
           <HPHeading eyebrow="What I Do" title="Services" />
           <div className="hp-services-grid">
@@ -380,10 +374,8 @@ export default function Home() {
               <motion.div
                 key={s.title}
                 className="hp-service-card"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
+                whileHover={{ y: -3 }}
+                transition={{ duration: 0.2 }}
               >
                 <div className="hp-service-icon">
                   {SERVICE_ICONS[s.title] ?? <FaReact />}
@@ -397,7 +389,8 @@ export default function Home() {
       </div>
 
       {/* ── FEATURED PROJECTS ──────────────────────────────────── */}
-      <div className="hp-section">
+      <div className="hp-projects-wrapper">
+        <div className="hp-section">
         <HPHeading eyebrow="Recent Work" title="Featured Projects" />
         {loading ? (
           <div className="hp-projects-grid">
@@ -415,14 +408,11 @@ export default function Home() {
         ) : featuredProjects.length > 0 ? (
           <div className="hp-projects-grid">
             {featuredProjects.map((p, i) => (
-              /* ProjectCard now uses hp-* classes internally */
               <motion.div
                 key={p.name}
                 className="hp-project-card"
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: i * 0.1 }}
+                whileHover={{ y: -4 }}
+                transition={{ duration: 0.2 }}
               >
                 {p.image ? (
                   <div className="hp-project-img">
@@ -468,10 +458,11 @@ export default function Home() {
             View All Projects <FiArrowRight size={14} />
           </NavLink>
         </div>
+        </div>
       </div>
 
       {/* ── WHY HIRE ME ────────────────────────────────────────── */}
-      <div className="hp-section-alt-wrapper">
+      <div className="hp-why-wrapper">
         <div className="hp-section">
           <HPHeading eyebrow="Why Work With Me" title="Why Hire Me" />
           <div className="hp-why-grid">
@@ -495,10 +486,8 @@ export default function Home() {
               <motion.div
                 key={card.n}
                 className="hp-why-card"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
+                whileHover={{ y: -3 }}
+                transition={{ duration: 0.2 }}
               >
                 <div className="hp-why-num">{card.n}</div>
                 <h3 className="hp-why-title">{card.title}</h3>
@@ -509,21 +498,16 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── CURRENTLY LEARNING ─────────────────────────────────── */}
-      <div className="hp-section">
-        <HPHeading eyebrow="Always Growing" title="Currently Learning" />
-        <motion.div
-          className="hp-learning-box"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
+      {/* ── CURRENTLY LEARNING BAND ─────────────────────────────── */}
+      <div className="hp-learning-band">
+        <div className="hp-learning-inner">
+          <span className="hp-learning-eyebrow">Always Growing</span>
+          <h2 className="hp-learning-heading">Currently Learning</h2>
           <p className="hp-learning-text">
             Deepening expertise in system design, GraphQL, and cloud deployment — building on a
             strong foundation of React, Next.js, Node.js, MongoDB, and PostgreSQL.
           </p>
-        </motion.div>
+        </div>
       </div>
 
       {/* ── FOOTER ─────────────────────────────────────────────── */}

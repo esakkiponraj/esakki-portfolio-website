@@ -26,14 +26,35 @@ const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
 
-// --- Core middleware ---
+// --- CORS (must be the very first middleware so OPTIONS preflights
+//     are handled before any auth, rate-limiting, or other middleware
+//     has a chance to short-circuit the request) ---
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+  : [];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (curl, Postman, server-to-server)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    callback(new Error(`CORS: origin ${origin} not allowed`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+// Apply CORS to every request
+app.use(cors(corsOptions));
+// Respond to all OPTIONS preflights immediately — before any other
+// middleware (rate-limiters, auth, validators) can intercept them.
+app.options('*', cors(corsOptions));
+
+// --- Other core middleware ---
 app.use(helmet());
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*',
-    credentials: true,
-  })
-);
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV !== 'production') {
@@ -74,6 +95,7 @@ const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
+    console.log(`CORS allowed origins: ${allowedOrigins.length ? allowedOrigins.join(', ') : '(all — no CORS_ORIGIN set)'}`);
   });
 });
 
