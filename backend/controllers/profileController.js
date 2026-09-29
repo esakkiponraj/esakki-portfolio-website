@@ -1,10 +1,15 @@
 const Profile = require('../models/Profile');
 const asyncHandler = require('../utils/asyncHandler');
+const cache = require('../utils/cache');
 
 // GET /api/profile — public. Creates a default profile on first request
 // if none exists yet, so the frontend never gets a 404.
 const getProfile = asyncHandler(async (req, res) => {
-  let profile = await Profile.findOne();
+  const cached = cache.get('profile');
+  if (cached) {
+    return res.json(cached);
+  }
+  let profile = await Profile.findOne().lean();
   if (!profile) {
     profile = await Profile.create({
       name: 'Esakki Ponraj M',
@@ -14,7 +19,9 @@ const getProfile = asyncHandler(async (req, res) => {
       taglines: ['Full Stack Developer', 'MERN Stack Developer', 'React Developer', 'Backend Developer'],
     });
   }
-  res.json({ success: true, data: profile });
+  const result = { success: true, data: profile };
+  cache.set('profile', result);
+  res.json(result);
 });
 
 // PUT /api/profile — admin only
@@ -28,6 +35,8 @@ const updateProfile = asyncHandler(async (req, res) => {
       runValidators: true,
     });
   }
+  cache.del('profile');
+  cache.del('portfolio_bundle');
   res.json({ success: true, data: profile });
 });
 

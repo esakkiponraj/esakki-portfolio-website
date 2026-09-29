@@ -37,11 +37,12 @@ export default function Contact() {
     if (!validate()) return;
     setLoading(true);
     try {
-      await submitContactForm(form);
-      toast.success("Message sent! I'll get back to you shortly.");
+      const res = await submitContactForm(form);
+      toast.success(res?.message || "Message sent! I'll get back to you shortly.");
       setForm(initialState);
-    } catch {
-      toast.error('Could not send message right now. Please email me directly.');
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Could not send message right now. Please email me directly.';
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

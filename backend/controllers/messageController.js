@@ -42,20 +42,12 @@ const submitMessage = asyncHandler(async (req, res) => {
   savedMessage.confirmationEmailSent = confirmationEmailSent;
   await savedMessage.save();
 
-  if (!notificationEmailSent) {
-    // The message is safely stored, but the owner wasn't notified by email —
-    // surface this as an error so the visitor knows to double check, while
-    // nothing is actually lost on the backend.
-    return res.status(502).json({
-      success: false,
-      message: 'Your message was saved, but the notification email could not be sent. Please also reach out directly.',
-    });
-  }
-
   res.status(201).json({
     success: true,
     message: 'Thank you for reaching out. I have received your message and will get back to you shortly.',
     data: { id: savedMessage._id },
+    notificationEmailSent,
+    confirmationEmailSent,
   });
 });
 

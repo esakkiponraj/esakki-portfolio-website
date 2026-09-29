@@ -46,20 +46,32 @@ function groupSkills(flatSkills: any[]): typeof staticSkillCategories {
   }));
 }
 
+const CACHE_KEY = 'portfolio_cms_cache_v2';
+
+function readCache(): any {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
 export function PortfolioDataProvider({ children }: { children: ReactNode }) {
-  const [personalInfo, setPersonalInfo] = useState(staticPersonalInfo);
-  const [stats, setStats] = useState(staticStats);
-  const [education, setEducation] = useState(staticEducation);
-  const [experience, setExperience] = useState(staticExperience);
-  const [projects, setProjects] = useState(staticProjects);
-  const [skillCategories, setSkillCategories] = useState(staticSkillCategories);
-  const [certificates, setCertificates] = useState<(typeof staticCertificates[number] & { fileUrl?: string })[]>(staticCertificates);
-  const [achievements, setAchievements] = useState(staticAchievements);
-  const [loading, setLoading] = useState(true);
-  const [isLive, setIsLive] = useState(false);
+  const cached = readCache();
+  const [personalInfo, setPersonalInfo] = useState(cached?.personalInfo || staticPersonalInfo);
+  const [stats, setStats] = useState(cached?.stats || staticStats);
+  const [education, setEducation] = useState(cached?.education || staticEducation);
+  const [experience, setExperience] = useState(cached?.experience || staticExperience);
+  const [projects, setProjects] = useState(cached?.projects || staticProjects);
+  const [skillCategories, setSkillCategories] = useState(cached?.skillCategories || staticSkillCategories);
+  const [certificates, setCertificates] = useState<(typeof staticCertificates[number] & { fileUrl?: string })[]>(cached?.certificates || staticCertificates);
+  const [achievements, setAchievements] = useState(cached?.achievements || staticAchievements);
+  const [loading, setLoading] = useState(!cached);
+  const [isLive, setIsLive] = useState(!!cached?.isLive);
 
   const loadAll = useCallback(async () => {
-    setLoading(true);
 
     // Fired together so every request starts immediately, but awaited in two
     // groups: the profile-critical group (drives the hero photo/name/etc.)
@@ -153,8 +165,7 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
       setCertificates(certificatesRes.value);
     }
 
-    // Stats derived from live counts where available, falling back per-field otherwise
-    setStats([
+    const finalStats = [
       {
         label: 'Internships Completed',
         value: experienceRes.status === 'fulfilled' && experienceRes.value.length > 0 ? experienceRes.value.length : staticStats[0].value,
@@ -171,9 +182,52 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
         suffix: '',
       },
       staticStats[3], // "Years Coding" isn't derivable from CMS content — left as-is
-    ]);
+    ];
+    setStats(finalStats);
 
     setLoading(false);
+
+    try {
+      localStorage.setItem(
+        CACHE_KEY,
+        JSON.stringify({
+          personalInfo: profileRes.status === 'fulfilled' ? {
+            name: profileRes.value.name || staticPersonalInfo.name,
+            title: profileRes.value.title || staticPersonalInfo.title,
+            taglines: profileRes.value.taglines?.length ? profileRes.value.taglines : staticPersonalInfo.taglines,
+            summary: profileRes.value.summary || staticPersonalInfo.summary,
+            email: (contactInfoRes.status === 'fulfilled' ? contactInfoRes.value.email : null) || profileRes.value.email || staticPersonalInfo.email,
+            phone: (contactInfoRes.status === 'fulfilled' ? contactInfoRes.value.phone : null) || profileRes.value.phone || staticPersonalInfo.phone,
+            location: (contactInfoRes.status === 'fulfilled' ? contactInfoRes.value.address : null) || profileRes.value.location || staticPersonalInfo.location,
+            status: profileRes.value.status || staticPersonalInfo.status,
+            photo: resolveMediaUrl(profileRes.value.photoUrl) || staticPersonalInfo.photo,
+            resumeUrl: profileRes.value.resumeUrl || staticPersonalInfo.resumeUrl,
+            socials,
+          } : staticPersonalInfo,
+          stats: finalStats,
+          education: educationRes.status === 'fulfilled' && educationRes.value.length > 0 ? educationRes.value : staticEducation,
+          experience: experienceRes.status === 'fulfilled' && experienceRes.value.length > 0 ? experienceRes.value : staticExperience,
+          projects: projectsRes.status === 'fulfilled' && projectsRes.value.length > 0
+            ? projectsRes.value.map((p: any) => ({
+                name: p.name,
+                description: p.description,
+                technologies: p.technologies || [],
+                features: p.features || [],
+                image: resolveMediaUrl(p.imageUrl),
+                link: p.liveLink || undefined,
+                githubLink: p.githubLink || undefined,
+                category: (p.category?.length ? p.category : ['fullstack']) as ProjectCategory[],
+              }))
+            : staticProjects,
+          skillCategories: skillsRes.status === 'fulfilled' && skillsRes.value.length > 0 ? groupSkills(skillsRes.value) : staticSkillCategories,
+          certificates: certificatesRes.status === 'fulfilled' && certificatesRes.value.length > 0 ? certificatesRes.value : staticCertificates,
+          achievements: achievementsRes.status === 'fulfilled' && achievementsRes.value.length > 0 ? achievementsRes.value : staticAchievements,
+          isLive: true,
+        })
+      );
+    } catch {
+      // ignore
+    }
   }, []);
 
   useEffect(() => {

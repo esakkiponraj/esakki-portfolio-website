@@ -129,8 +129,18 @@ export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
-    window.addEventListener('scroll', onScroll);
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const isPast = window.scrollY > 20;
+          setScrolled((prev) => (prev !== isPast ? isPast : prev));
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
@@ -142,81 +152,142 @@ export default function Home() {
   return (
     <div className="hp-root">
       {/* ── NAVBAR ─────────────────────────────────────────────── */}
-      <nav className={`hp-nav${scrolled ? ' scrolled' : ''}`}>
-        <div className="hp-nav-inner">
-          <NavLink to="/" className="hp-nav-logo">
-            Esakki<span>.</span>
-          </NavLink>
+      <header
+        style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0,
+          zIndex: 50,
+          display: 'flex',
+          justifyContent: 'center',
+          padding: scrolled ? '0.6rem 1.5rem' : '0',
+          transition: 'padding 0.35s ease',
+          pointerEvents: 'none',
+        }}
+      >
+        {/* ── Full-width bar (before scroll) ── */}
+        {!scrolled && (
+          <div style={{ width: '100%', background: '#ffffff', borderBottom: '1px solid #D6E4F0', pointerEvents: 'auto' }}>
+            <div className="hp-nav-inner">
+              <NavLink to="/" className="hp-nav-logo">Esakki<span>.</span></NavLink>
 
-          <ul className="hp-nav-links">
-            {NAV_LINKS.map((l) => (
-              <li key={l.to}>
-                <NavLink
-                  to={l.to}
-                  end={l.end}
-                  className={({ isActive }) => `hp-nav-link${isActive ? ' active' : ''}`}
+              <ul className="hp-nav-links">
+                {NAV_LINKS.map((l) => (
+                  <li key={l.to}>
+                    <NavLink to={l.to} end={l.end}
+                      className={({ isActive }) => `hp-nav-link${isActive ? ' active' : ''}`}>
+                      {l.label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="hp-nav-actions">
+                <a href={personalInfo.resumeUrl} download id="nav-resume-download" className="hp-btn-ghost">
+                  <FiDownload size={13} /> Resume
+                </a>
+                <NavLink to="/contact" className="hp-btn-solid" id="nav-hire-me">Hire Me</NavLink>
+              </div>
+
+              <button className="hp-nav-hamburger" onClick={() => setMobileOpen(o => !o)}
+                aria-label="Toggle mobile menu" id="nav-mobile-toggle">
+                {mobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Floating pill (after scroll) ── */}
+        {scrolled && (
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              background: '#ffffff',
+              border: '1px solid #D6E4F0',
+              borderRadius: 100,
+              boxShadow: '0 4px 24px rgba(52,84,116,0.14)',
+              padding: '0.45rem 1.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              pointerEvents: 'auto',
+              maxWidth: 920,
+              width: '100%',
+            }}
+          >
+            <NavLink to="/" style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: '1rem', color: '#202A35', textDecoration: 'none', marginRight: '0.75rem', whiteSpace: 'nowrap' }}>
+              Esakki<span style={{ color: '#345474' }}>.</span>
+            </NavLink>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.1rem', flex: 1, justifyContent: 'center', flexWrap: 'wrap' }}>
+              {NAV_LINKS.map((l) => (
+                <NavLink key={l.to} to={l.to} end={l.end}
+                  style={({ isActive }) => ({
+                    padding: '0.3rem 0.65rem', fontSize: '0.82rem',
+                    fontWeight: isActive ? 600 : 500,
+                    color: isActive ? '#345474' : '#6B7480',
+                    textDecoration: 'none', borderRadius: 100,
+                    background: isActive ? '#EDF3F9' : 'transparent',
+                    transition: 'color 0.2s, background 0.2s',
+                    whiteSpace: 'nowrap',
+                  })}
                 >
                   {l.label}
                 </NavLink>
-              </li>
-            ))}
-          </ul>
+              ))}
+            </div>
 
-          <div className="hp-nav-actions">
-            <a
-              href={personalInfo.resumeUrl}
-              download
-              id="nav-resume-download"
-              className="hp-btn-ghost"
-            >
-              <FiDownload size={13} /> Resume
-            </a>
-            <NavLink to="/contact" className="hp-btn-solid" id="nav-hire-me">
-              Hire Me
-            </NavLink>
-          </div>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.5rem' }}>
+              <a href={personalInfo.resumeUrl} download
+                style={{ padding: '0.32rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, color: '#345474', border: '1px solid #B8D0E8', borderRadius: 100, textDecoration: 'none', background: '#EDF3F9', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                <FiDownload size={11} /> Resume
+              </a>
+              <NavLink to="/contact"
+                style={{ padding: '0.32rem 0.85rem', fontSize: '0.78rem', fontWeight: 600, color: '#fff', background: '#345474', borderRadius: 100, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                Hire Me
+              </NavLink>
+            </div>
+          </motion.div>
+        )}
 
-          <button
-            className="hp-nav-hamburger"
-            onClick={() => setMobileOpen((o) => !o)}
-            aria-label="Toggle mobile menu"
-            id="nav-mobile-toggle"
-          >
-            {mobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-          </button>
-        </div>
 
+
+        {/* ── Mobile slide-down panel ── */}
         <AnimatePresence>
           {mobileOpen && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className={`hp-nav-mobile open`}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              style={{
+                position: 'fixed', top: scrolled ? '4rem' : '64px',
+                left: '1rem', right: '1rem',
+                background: '#fff', border: '1px solid #D6E4F0',
+                borderRadius: 12, padding: '1rem',
+                boxShadow: '0 8px 32px rgba(52,84,116,0.14)',
+                zIndex: 55, display: 'flex', flexDirection: 'column', gap: '0.2rem',
+                pointerEvents: 'auto',
+              }}
             >
               {NAV_LINKS.map((l) => (
-                <NavLink
-                  key={l.to}
-                  to={l.to}
-                  end={l.end}
+                <NavLink key={l.to} to={l.to} end={l.end}
                   onClick={() => setMobileOpen(false)}
                   className={({ isActive }) => `hp-nav-mobile-link${isActive ? ' active' : ''}`}
                 >
                   {l.label}
                 </NavLink>
               ))}
-              <a
-                href={personalInfo.resumeUrl}
-                download
+              <a href={personalInfo.resumeUrl} download
                 className="hp-cta-secondary"
-                style={{ marginTop: '0.5rem', justifyContent: 'center' }}
-              >
+                style={{ marginTop: '0.5rem', justifyContent: 'center' }}>
                 <FiDownload size={13} /> Download Resume
               </a>
             </motion.div>
           )}
         </AnimatePresence>
-      </nav>
+      </header>
+
 
       {/* ── HERO ───────────────────────────────────────────────── */}
       <section className="hp-hero" aria-label="Introduction">
@@ -235,7 +306,7 @@ export default function Home() {
             )}
 
             <h1 className="hp-hero-name" id="hero-name">
-              {loading ? (
+              {loading && !personalInfo.name ? (
                 <span className="hp-skeleton" style={{ display: 'block', height: '3.4rem', width: '80%' }} />
               ) : (
                 personalInfo.name
@@ -248,7 +319,7 @@ export default function Home() {
             </p>
 
             <p className="hp-hero-summary" id="hero-summary">
-              {loading ? (
+              {loading && !personalInfo.summary ? (
                 <>
                   <span className="hp-skeleton" style={{ display: 'block', height: '1rem', marginBottom: '0.4rem' }} />
                   <span className="hp-skeleton" style={{ display: 'block', height: '1rem', width: '90%', marginBottom: '0.4rem' }} />
@@ -392,7 +463,7 @@ export default function Home() {
       <div className="hp-projects-wrapper">
         <div className="hp-section">
         <HPHeading eyebrow="Recent Work" title="Featured Projects" />
-        {loading ? (
+        {featuredProjects.length === 0 && loading ? (
           <div className="hp-projects-grid">
             {[1, 2, 3].map((n) => (
               <div key={n} className="hp-project-card">

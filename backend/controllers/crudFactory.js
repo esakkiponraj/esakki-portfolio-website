@@ -1,23 +1,41 @@
 const asyncHandler = require('../utils/asyncHandler');
+const cache = require('../utils/cache');
 
 // Generates standard CRUD handlers for a given Mongoose model.
 // Used by Project/Skill/Education/Experience/Achievement/Testimonial/Blog
-// controllers so each resource gets consistent, tested behavior without
-// duplicating the same logic ten times over.
+// controllers with in-memory caching for sub-millisecond public response times.
 function createCrudController(Model, sortField = 'order') {
+  const modelName = Model.modelName || 'Resource';
+
   const getAll = asyncHandler(async (req, res) => {
-    const items = await Model.find().sort({ [sortField]: 1, createdAt: 1 });
-    res.json({ success: true, count: items.length, data: items });
+    const cacheKey = `${modelName}:all`;
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      return res.json(cached);
+    }
+    const items = await Model.find().sort({ [sortField]: 1, createdAt: 1 }).lean();
+    const result = { success: true, count: items.length, data: items };
+    cache.set(cacheKey, result);
+    res.json(result);
   });
 
   const getOne = asyncHandler(async (req, res) => {
-    const item = await Model.findById(req.params.id);
+    const cacheKey = `${modelName}:${req.params.id}`;
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      return res.json(cached);
+    }
+    const item = await Model.findById(req.params.id).lean();
     if (!item) return res.status(404).json({ success: false, message: 'Not found' });
-    res.json({ success: true, data: item });
+    const result = { success: true, data: item };
+    cache.set(cacheKey, result);
+    res.json(result);
   });
 
   const create = asyncHandler(async (req, res) => {
     const item = await Model.create(req.body);
+    cache.del(modelName);
+    cache.del('portfolio_bundle');
     res.status(201).json({ success: true, data: item });
   });
 
@@ -27,12 +45,16 @@ function createCrudController(Model, sortField = 'order') {
       runValidators: true,
     });
     if (!item) return res.status(404).json({ success: false, message: 'Not found' });
+    cache.del(modelName);
+    cache.del('portfolio_bundle');
     res.json({ success: true, data: item });
   });
 
   const remove = asyncHandler(async (req, res) => {
     const item = await Model.findByIdAndDelete(req.params.id);
     if (!item) return res.status(404).json({ success: false, message: 'Not found' });
+    cache.del(modelName);
+    cache.del('portfolio_bundle');
     res.json({ success: true, message: 'Deleted successfully' });
   });
 
