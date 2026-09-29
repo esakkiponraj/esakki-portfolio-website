@@ -1,9 +1,9 @@
+import './public.css';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { FiMail, FiPhone, FiMapPin, FiSend } from 'react-icons/fi';
-import SectionHeading from '../components/SectionHeading';
-import GlassCard from '../components/GlassCard';
+import { FiGithub, FiLinkedin } from 'react-icons/fi';
 import { usePortfolioData } from '../context/PortfolioDataContext';
 import { submitContactForm } from '../services/api';
 
@@ -13,7 +13,6 @@ interface FormState {
   subject: string;
   message: string;
 }
-
 const initialState: FormState = { name: '', email: '', subject: '', message: '' };
 
 export default function Contact() {
@@ -36,109 +35,128 @@ export default function Contact() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
-
     setLoading(true);
     try {
       await submitContactForm(form);
       toast.success("Message sent! I'll get back to you shortly.");
       setForm(initialState);
-    } catch (err) {
-      // Backend not connected yet, or a network/server error occurred.
-      toast.error('Could not send message right now — the backend may not be connected yet. Please email me directly.');
+    } catch {
+      toast.error('Could not send message right now. Please email me directly.');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="section-container">
-      <SectionHeading eyebrow="Get In Touch" title="Contact Me" />
-
-      <div className="grid lg:grid-cols-2 gap-10">
-        <div>
-          <GlassCard className="mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-sm text-green-400 font-medium">{personalInfo.status}</span>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 text-fg/80">
-                <FiMail className="text-accent shrink-0" />
-                <a href={personalInfo.socials.email} className="hover:text-accent transition-colors">{personalInfo.email}</a>
-              </div>
-              <div className="flex items-center gap-3 text-fg/80">
-                <FiPhone className="text-accent shrink-0" />
-                <a href={`tel:${personalInfo.phone}`} className="hover:text-accent transition-colors">{personalInfo.phone}</a>
-              </div>
-              <div className="flex items-center gap-3 text-fg/80">
-                <FiMapPin className="text-accent shrink-0" />
-                <span>{personalInfo.location}</span>
-              </div>
-            </div>
-          </GlassCard>
-        </div>
-
-        <motion.form
-          onSubmit={handleSubmit}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="glass rounded-2xl p-6 md:p-8 space-y-5"
-          noValidate
+    <div className="pub-page">
+      <div className="pub-container">
+        <motion.div
+          className="pub-header center"
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          <div>
-            <label className="text-sm text-fg/70 mb-1.5 block">Name</label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full bg-fg/5 border border-fg/10 focus:border-accent rounded-lg px-4 py-2.5 outline-none transition-colors"
-              placeholder="Your name"
-            />
-            {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
-          </div>
+          <span className="pub-eyebrow">Get In Touch</span>
+          <h1 className="pub-title">Contact Me</h1>
+          <hr className="pub-rule" />
+        </motion.div>
 
-          <div>
-            <label className="text-sm text-fg/70 mb-1.5 block">Email</label>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full bg-fg/5 border border-fg/10 focus:border-accent rounded-lg px-4 py-2.5 outline-none transition-colors"
-              placeholder="you@example.com"
-            />
-            {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '2rem', alignItems: 'start' }}
+          className="pub-contact-layout">
+          {/* Info column */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {personalInfo.status && (
+              <div className="pub-status-badge" style={{ marginBottom: '1.5rem' }}>
+                <span className="pub-status-dot" /> {personalInfo.status}
+              </div>
+            )}
 
-          <div>
-            <label className="text-sm text-fg/70 mb-1.5 block">Subject</label>
-            <input
-              type="text"
-              value={form.subject}
-              onChange={(e) => setForm({ ...form, subject: e.target.value })}
-              className="w-full bg-fg/5 border border-fg/10 focus:border-accent rounded-lg px-4 py-2.5 outline-none transition-colors"
-              placeholder="What's this about?"
-            />
-            {errors.subject && <p className="text-red-400 text-xs mt-1">{errors.subject}</p>}
-          </div>
+            <div className="pub-contact-info" style={{ marginBottom: '1.5rem' }}>
+              <h3 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: '0.975rem', fontWeight: 700, color: '#202A35', margin: '0 0 1.25rem' }}>
+                Contact Details
+              </h3>
+              {personalInfo.email && (
+                <div className="pub-contact-row">
+                  <div className="pub-contact-icon"><FiMail size={15} /></div>
+                  <a href={personalInfo.socials.email} className="pub-contact-link">{personalInfo.email}</a>
+                </div>
+              )}
+              {personalInfo.phone && (
+                <div className="pub-contact-row">
+                  <div className="pub-contact-icon"><FiPhone size={15} /></div>
+                  <a href={`tel:${personalInfo.phone}`} className="pub-contact-link">{personalInfo.phone}</a>
+                </div>
+              )}
+              {personalInfo.location && (
+                <div className="pub-contact-row">
+                  <div className="pub-contact-icon"><FiMapPin size={15} /></div>
+                  <span className="pub-contact-link">{personalInfo.location}</span>
+                </div>
+              )}
+            </div>
 
-          <div>
-            <label className="text-sm text-fg/70 mb-1.5 block">Message</label>
-            <textarea
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-              rows={5}
-              className="w-full bg-fg/5 border border-fg/10 focus:border-accent rounded-lg px-4 py-2.5 outline-none transition-colors resize-none"
-              placeholder="Your message..."
-            />
-            {errors.message && <p className="text-red-400 text-xs mt-1">{errors.message}</p>}
-          </div>
+            {/* Socials */}
+            <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+              {personalInfo.socials.github && personalInfo.socials.github !== '#' && (
+                <a href={personalInfo.socials.github} target="_blank" rel="noopener noreferrer"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.45rem 0.9rem', fontSize: '0.82rem', fontWeight: 600, color: '#345474', border: '1px solid #D6E4F0', borderRadius: 8, textDecoration: 'none', background: '#fff' }}>
+                  <FiGithub size={14} /> GitHub
+                </a>
+              )}
+              {personalInfo.socials.linkedin && personalInfo.socials.linkedin !== '#' && (
+                <a href={personalInfo.socials.linkedin} target="_blank" rel="noopener noreferrer"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.45rem 0.9rem', fontSize: '0.82rem', fontWeight: 600, color: '#345474', border: '1px solid #D6E4F0', borderRadius: 8, textDecoration: 'none', background: '#fff' }}>
+                  <FiLinkedin size={14} /> LinkedIn
+                </a>
+              )}
+            </div>
+          </motion.div>
 
-          <button type="submit" disabled={loading} className="btn-primary w-full justify-center disabled:opacity-60">
-            {loading ? 'Sending...' : <>Send Message <FiSend /></>}
-          </button>
-        </motion.form>
+          {/* Form column */}
+          <motion.form
+            onSubmit={handleSubmit}
+            className="pub-form"
+            initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            noValidate
+            style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}
+          >
+            <div>
+              <label className="pub-label" htmlFor="contact-name">Name</label>
+              <input id="contact-name" type="text" value={form.name}
+                onChange={e => setForm({ ...form, name: e.target.value })}
+                className="pub-input" placeholder="Your name" />
+              {errors.name && <span className="pub-error">{errors.name}</span>}
+            </div>
+            <div>
+              <label className="pub-label" htmlFor="contact-email">Email</label>
+              <input id="contact-email" type="email" value={form.email}
+                onChange={e => setForm({ ...form, email: e.target.value })}
+                className="pub-input" placeholder="you@example.com" />
+              {errors.email && <span className="pub-error">{errors.email}</span>}
+            </div>
+            <div>
+              <label className="pub-label" htmlFor="contact-subject">Subject</label>
+              <input id="contact-subject" type="text" value={form.subject}
+                onChange={e => setForm({ ...form, subject: e.target.value })}
+                className="pub-input" placeholder="What's this about?" />
+              {errors.subject && <span className="pub-error">{errors.subject}</span>}
+            </div>
+            <div>
+              <label className="pub-label" htmlFor="contact-message">Message</label>
+              <textarea id="contact-message" value={form.message}
+                onChange={e => setForm({ ...form, message: e.target.value })}
+                rows={5} className="pub-input" placeholder="Your message..."
+                style={{ resize: 'none' }} />
+              {errors.message && <span className="pub-error">{errors.message}</span>}
+            </div>
+            <button type="submit" disabled={loading} className="pub-submit">
+              {loading ? 'Sending…' : <><FiSend size={14} /> Send Message</>}
+            </button>
+          </motion.form>
+        </div>
       </div>
     </div>
   );
