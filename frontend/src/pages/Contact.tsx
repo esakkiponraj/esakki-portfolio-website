@@ -2,7 +2,7 @@ import './public.css';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
-import { FiMail, FiPhone, FiMapPin, FiSend } from 'react-icons/fi';
+import { FiMail, FiPhone, FiMapPin, FiSend, FiCheck } from 'react-icons/fi';
 import { FiGithub, FiLinkedin } from 'react-icons/fi';
 import { usePortfolioData } from '../context/PortfolioDataContext';
 import { submitContactForm } from '../services/api';
@@ -20,6 +20,7 @@ export default function Contact() {
   const [form, setForm] = useState<FormState>(initialState);
   const [errors, setErrors] = useState<Partial<FormState>>({});
   const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
 
   function validate(): boolean {
     const next: Partial<FormState> = {};
@@ -40,6 +41,8 @@ export default function Contact() {
       const res = await submitContactForm(form);
       toast.success(res?.message || "Message sent! I'll get back to you shortly.");
       setForm(initialState);
+      setSent(true);
+      setTimeout(() => setSent(false), 4000);
     } catch (err: any) {
       const msg = err?.response?.data?.message || 'Could not send message right now. Please email me directly.';
       toast.error(msg);
@@ -153,8 +156,19 @@ export default function Contact() {
                 style={{ resize: 'none' }} />
               {errors.message && <span className="pub-error">{errors.message}</span>}
             </div>
-            <button type="submit" disabled={loading} className="pub-submit">
-              {loading ? 'Sending…' : <><FiSend size={14} /> Send Message</>}
+            <button
+              type="submit"
+              disabled={loading}
+              className="pub-submit"
+              style={sent ? { background: '#2d8f5e', borderColor: '#2d8f5e' } : {}}
+            >
+              {loading ? (
+                'Sending…'
+              ) : sent ? (
+                <><FiCheck size={16} /> Message Sent!</>
+              ) : (
+                <><FiSend size={14} /> Send Message</>
+              )}
             </button>
           </motion.form>
         </div>

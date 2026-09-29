@@ -29,8 +29,7 @@ const updateContactInfo = asyncHandler(async (req, res) => {
   } else {
     info = await ContactInfo.findByIdAndUpdate(info._id, req.body, { new: true, runValidators: true });
   }
-  cache.del('contactInfo');
-  cache.del('portfolio_bundle');
+  cache.clear();
   res.json({ success: true, data: info });
 });
 

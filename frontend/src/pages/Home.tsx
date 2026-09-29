@@ -367,15 +367,6 @@ export default function Home() {
                   <FiLinkedin size={17} />
                 </a>
               )}
-              {personalInfo.socials.email && (
-                <a
-                  href={personalInfo.socials.email}
-                  className="hp-social-link"
-                  aria-label="Send email"
-                >
-                  <FiMail size={17} />
-                </a>
-              )}
             </div>
           </motion.div>
 

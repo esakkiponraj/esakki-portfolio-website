@@ -17,11 +17,31 @@ adminApi.interceptors.request.use((config) => {
 });
 
 // If the token is invalid/expired, bounce back to the login screen.
+// On successful mutations (POST, PUT, PATCH, DELETE), automatically invalidate public cache!
 adminApi.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const method = response.config.method?.toUpperCase();
+    if (method && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+      try {
+        localStorage.removeItem('portfolio_cms_cache_v2');
+        // Clear sessionStorage resource caches as well
+        for (let i = 0; i < sessionStorage.length; i++) {
+          const k = sessionStorage.key(i);
+          if (k && k.startsWith('cms_res_')) {
+            sessionStorage.removeItem(k);
+          }
+        }
+        window.dispatchEvent(new Event('cms_content_updated'));
+      } catch {
+        // ignore
+      }
+    }
+    return response;
+  },
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('portfolio_admin_token');
+      localStorage.removeItem('portfolio_admin_user');
       if (window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin/login') {
         window.location.href = '/admin/login';
       }

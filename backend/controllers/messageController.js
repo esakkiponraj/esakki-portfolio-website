@@ -21,34 +21,39 @@ const submitMessage = asyncHandler(async (req, res) => {
 
   const savedMessage = await Message.create({ name, email, subject, message });
 
-  let notificationEmailSent = false;
-  let confirmationEmailSent = false;
-
-  try {
-    await sendNotificationEmail({ name, email, subject, message });
-    notificationEmailSent = true;
-  } catch (err) {
-    console.error('Failed to send notification email:', err.message);
-  }
-
-  try {
-    await sendConfirmationEmail({ name, email });
-    confirmationEmailSent = true;
-  } catch (err) {
-    console.error('Failed to send confirmation email:', err.message);
-  }
-
-  savedMessage.notificationEmailSent = notificationEmailSent;
-  savedMessage.confirmationEmailSent = confirmationEmailSent;
-  await savedMessage.save();
-
+  // 1. Immediately respond to client so the UI never hangs on "Sending..."
   res.status(201).json({
     success: true,
     message: 'Thank you for reaching out. I have received your message and will get back to you shortly.',
     data: { id: savedMessage._id },
-    notificationEmailSent,
-    confirmationEmailSent,
   });
+
+  // 2. Dispatch emails in parallel in the background without blocking the user
+  (async () => {
+    try {
+      const [notifResult, confResult] = await Promise.allSettled([
+        sendNotificationEmail({ name, email, subject, message }),
+        sendConfirmationEmail({ name, email }),
+      ]);
+
+      const notificationEmailSent = notifResult.status === 'fulfilled';
+      const confirmationEmailSent = confResult.status === 'fulfilled';
+
+      if (!notificationEmailSent && notifResult.reason) {
+        console.error('Failed to send notification email:', notifResult.reason?.message || notifResult.reason);
+      }
+      if (!confirmationEmailSent && confResult.reason) {
+        console.error('Failed to send confirmation email:', confResult.reason?.message || confResult.reason);
+      }
+
+      await Message.findByIdAndUpdate(savedMessage._id, {
+        notificationEmailSent,
+        confirmationEmailSent,
+      });
+    } catch (err) {
+      console.error('Background email task error:', err.message);
+    }
+  })();
 });
 
 // GET /api/messages — admin only

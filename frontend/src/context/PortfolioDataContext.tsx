@@ -90,9 +90,9 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
       const links = socialLinksRes.value;
       const find = (platform: string) => links.find((l: any) => l.platform === platform)?.url;
       socials = {
-        github: find('github') || staticPersonalInfo.socials.github,
-        linkedin: find('linkedin') || staticPersonalInfo.socials.linkedin,
-        email: find('email') || staticPersonalInfo.socials.email,
+        github: find('github') || '',
+        linkedin: find('linkedin') || '',
+        email: find('email') || '',
       };
     }
 
@@ -232,6 +232,16 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     loadAll();
+
+    const handleCmsUpdate = () => {
+      loadAll();
+    };
+    window.addEventListener('cms_content_updated', handleCmsUpdate);
+    window.addEventListener('storage', handleCmsUpdate);
+    return () => {
+      window.removeEventListener('cms_content_updated', handleCmsUpdate);
+      window.removeEventListener('storage', handleCmsUpdate);
+    };
   }, [loadAll]);
 
   return (

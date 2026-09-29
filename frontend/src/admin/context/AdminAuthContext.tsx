@@ -17,29 +17,37 @@ interface AdminAuthContextType {
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
 
 const TOKEN_KEY = 'portfolio_admin_token';
+const USER_KEY = 'portfolio_admin_user';
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
-  const [admin, setAdmin] = useState<AdminUser | null>(null);
   const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
-  const [loading, setLoading] = useState(true);
+  const [admin, setAdmin] = useState<AdminUser | null>(() => {
+    try {
+      const stored = localStorage.getItem(USER_KEY);
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+  // Instant render — do not block with "Checking session..." if token exists
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function verify() {
       const storedToken = localStorage.getItem(TOKEN_KEY);
-      if (!storedToken) {
-        setLoading(false);
-        return;
-      }
+      if (!storedToken) return;
+
       try {
         const { data } = await adminApi.get('/auth/me');
         setAdmin(data.admin);
-        setToken(storedToken);
-      } catch {
-        localStorage.removeItem(TOKEN_KEY);
-        setToken(null);
-        setAdmin(null);
-      } finally {
-        setLoading(false);
+        localStorage.setItem(USER_KEY, JSON.stringify(data.admin));
+      } catch (err: any) {
+        if (err.response?.status === 401) {
+          localStorage.removeItem(TOKEN_KEY);
+          localStorage.removeItem(USER_KEY);
+          setToken(null);
+          setAdmin(null);
+        }
       }
     }
     verify();
@@ -48,12 +56,16 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   async function login(email: string, password: string) {
     const { data } = await adminApi.post('/auth/login', { email, password });
     localStorage.setItem(TOKEN_KEY, data.token);
+    if (data.admin) {
+      localStorage.setItem(USER_KEY, JSON.stringify(data.admin));
+    }
     setToken(data.token);
     setAdmin(data.admin);
   }
 
   function logout() {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
     setToken(null);
     setAdmin(null);
   }

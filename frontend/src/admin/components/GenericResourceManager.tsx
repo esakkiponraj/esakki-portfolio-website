@@ -43,18 +43,30 @@ function emptyFormFromFields(fields: FieldConfig[]) {
 }
 
 export default function GenericResourceManager({ resource, title, description, fields, columns }: Props) {
-  const [items, setItems] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState<any[]>(() => {
+    try {
+      const cached = sessionStorage.getItem(`cms_res_${resource}`);
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [loading, setLoading] = useState(items.length === 0);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Record<string, any>>(emptyFormFromFields(fields));
   const [saving, setSaving] = useState(false);
 
   const fetchItems = useCallback(async () => {
-    setLoading(true);
     try {
       const { data } = await adminApi.get(`/${resource}`);
-      setItems(data.data || []);
+      const list = data.data || [];
+      setItems(list);
+      try {
+        sessionStorage.setItem(`cms_res_${resource}`, JSON.stringify(list));
+      } catch {
+        // ignore
+      }
     } catch (err) {
       toast.error(`Could not load ${title.toLowerCase()}`);
     } finally {

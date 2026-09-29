@@ -29,9 +29,9 @@ export const personalInfo = {
   photo: profilePhoto,
   resumeUrl: "/resume.pdf",
   socials: {
-    github: "#", // TODO: add your GitHub profile URL
-    linkedin: "#", // TODO: add your LinkedIn profile URL
-    email: "mailto:mesakkiponraj@gmail.com",
+    github: "https://github.com/esakkiponraj",
+    linkedin: "https://www.linkedin.com/in/esakki-ponraj-m-6592912a5/?skipRedirect=true",
+    email: "",
   },
 };
 

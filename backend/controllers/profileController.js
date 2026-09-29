@@ -35,8 +35,7 @@ const updateProfile = asyncHandler(async (req, res) => {
       runValidators: true,
     });
   }
-  cache.del('profile');
-  cache.del('portfolio_bundle');
+  cache.clear();
   res.json({ success: true, data: profile });
 });
 

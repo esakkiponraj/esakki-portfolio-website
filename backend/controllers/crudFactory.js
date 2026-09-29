@@ -34,8 +34,7 @@ function createCrudController(Model, sortField = 'order') {
 
   const create = asyncHandler(async (req, res) => {
     const item = await Model.create(req.body);
-    cache.del(modelName);
-    cache.del('portfolio_bundle');
+    cache.clear();
     res.status(201).json({ success: true, data: item });
   });
 
@@ -45,16 +44,14 @@ function createCrudController(Model, sortField = 'order') {
       runValidators: true,
     });
     if (!item) return res.status(404).json({ success: false, message: 'Not found' });
-    cache.del(modelName);
-    cache.del('portfolio_bundle');
+    cache.clear();
     res.json({ success: true, data: item });
   });
 
   const remove = asyncHandler(async (req, res) => {
     const item = await Model.findByIdAndDelete(req.params.id);
     if (!item) return res.status(404).json({ success: false, message: 'Not found' });
-    cache.del(modelName);
-    cache.del('portfolio_bundle');
+    cache.clear();
     res.json({ success: true, message: 'Deleted successfully' });
   });
 
