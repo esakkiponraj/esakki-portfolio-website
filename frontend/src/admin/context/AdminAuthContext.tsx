@@ -66,6 +66,11 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   function logout() {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    try {
+      sessionStorage.removeItem('portfolio_admin_gate_unlocked');
+    } catch {
+      // ignore
+    }
     setToken(null);
     setAdmin(null);
   }

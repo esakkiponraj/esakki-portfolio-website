@@ -15,6 +15,7 @@ const Experience = lazy(() => import('./pages/Experience'));
 const Contact = lazy(() => import('./pages/Contact'));
 
 // Lazy-loaded Admin CMS pages — keeps the public site ultra-lightweight
+const AdminGatekeeper = lazy(() => import('./admin/components/AdminGatekeeper'));
 const AdminAuthProvider = lazy(() => import('./admin/context/AdminAuthContext').then(m => ({ default: m.AdminAuthProvider })));
 const ProtectedRoute = lazy(() => import('./admin/components/ProtectedRoute'));
 const AdminLayout = lazy(() => import('./admin/components/AdminLayout'));
@@ -76,29 +77,31 @@ export default function App() {
         }
       />
 
-      {/* Admin CMS — not linked anywhere on the public site */}
+      {/* Admin CMS — Encrypted by AdminGatekeeper security gateway */}
       <Route
         path="/admin/*"
         element={
           <Suspense fallback={<PageLoader />}>
-            <AdminAuthProvider>
-              <Routes>
-                <Route path="login" element={<Login />} />
-                <Route path="" element={<Protected><Dashboard /></Protected>} />
-                <Route path="profile" element={<Protected><ProfileEditor /></Protected>} />
-                <Route path="projects" element={<Protected><ProjectsManager /></Protected>} />
-                <Route path="skills" element={<Protected><SkillsManager /></Protected>} />
-                <Route path="certificates" element={<Protected><CertificatesManager /></Protected>} />
-                <Route path="education" element={<Protected><EducationManager /></Protected>} />
-                <Route path="experience" element={<Protected><ExperienceManager /></Protected>} />
-                <Route path="achievements" element={<Protected><AchievementsManager /></Protected>} />
-                <Route path="social-links" element={<Protected><SocialLinksManager /></Protected>} />
-                <Route path="contact-info" element={<Protected><ContactInfoEditor /></Protected>} />
-                <Route path="messages" element={<Protected><MessagesManager /></Protected>} />
-                <Route path="testimonials" element={<Protected><TestimonialsManager /></Protected>} />
-                <Route path="blogs" element={<Protected><BlogsManager /></Protected>} />
-              </Routes>
-            </AdminAuthProvider>
+            <AdminGatekeeper>
+              <AdminAuthProvider>
+                <Routes>
+                  <Route path="login" element={<Login />} />
+                  <Route path="" element={<Protected><Dashboard /></Protected>} />
+                  <Route path="profile" element={<Protected><ProfileEditor /></Protected>} />
+                  <Route path="projects" element={<Protected><ProjectsManager /></Protected>} />
+                  <Route path="skills" element={<Protected><SkillsManager /></Protected>} />
+                  <Route path="certificates" element={<Protected><CertificatesManager /></Protected>} />
+                  <Route path="education" element={<Protected><EducationManager /></Protected>} />
+                  <Route path="experience" element={<Protected><ExperienceManager /></Protected>} />
+                  <Route path="achievements" element={<Protected><AchievementsManager /></Protected>} />
+                  <Route path="social-links" element={<Protected><SocialLinksManager /></Protected>} />
+                  <Route path="contact-info" element={<Protected><ContactInfoEditor /></Protected>} />
+                  <Route path="messages" element={<Protected><MessagesManager /></Protected>} />
+                  <Route path="testimonials" element={<Protected><TestimonialsManager /></Protected>} />
+                  <Route path="blogs" element={<Protected><BlogsManager /></Protected>} />
+                </Routes>
+              </AdminAuthProvider>
+            </AdminGatekeeper>
           </Suspense>
         }
       />
