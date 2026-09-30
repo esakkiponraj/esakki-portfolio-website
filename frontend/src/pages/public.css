@@ -6,13 +6,63 @@
  */
 
 /* ─── Floating navbar responsive ───────────────────────────── */
+.pub-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  transition: padding 0.35s ease;
+  pointer-events: none;
+}
+
+@media (min-width: 1024px) {
+  .pub-header.is-scrolled {
+    padding: 0.6rem 1.5rem;
+  }
+}
+
+.pub-nav-bar {
+  width: 100%;
+  background: #ffffff;
+  border-bottom: 1px solid #D6E4F0;
+  pointer-events: auto;
+  transition: box-shadow 0.25s ease;
+}
+
+.pub-nav-bar.is-scrolled {
+  box-shadow: 0 2px 12px rgba(52, 84, 116, 0.08);
+}
+
+@media (min-width: 1024px) {
+  .pub-nav-bar.hide-on-desktop-scroll {
+    display: none;
+  }
+}
+
+/* Floating pill navigation — STRICTLY DESKTOP/LAPTOP ONLY */
+.pub-floating-nav {
+  display: none !important;
+}
+
+@media (min-width: 1024px) {
+  .pub-floating-nav {
+    display: flex !important;
+  }
+}
+
 .pub-nav-links-desktop { }
+.pub-nav-actions-desktop { }
 .pub-hamburger { display: none !important; }
 .pub-nav-link:hover { color: #345474 !important; background: #EDF3F9; }
 .pub-btn-ghost:hover { background: #345474 !important; color: #fff !important; }
 
-@media (max-width: 900px) {
-  .pub-nav-links-desktop { display: none !important; }
+@media (max-width: 1023px) {
+  .pub-nav-links-desktop,
+  .pub-nav-actions-desktop { display: none !important; }
   .pub-hamburger { display: flex !important; }
 }
 

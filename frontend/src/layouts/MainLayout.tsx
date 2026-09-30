@@ -1,4 +1,4 @@
-import { useState, ReactNode } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { useLocation, NavLink } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -25,96 +25,74 @@ function PublicNavbar() {
   const [open, setOpen] = useState(false);
 
   /* Floating appearance on scroll */
-  useState(() => {
+  useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 40);
-    window.addEventListener('scroll', handler);
+    window.addEventListener('scroll', handler, { passive: true });
     return () => window.removeEventListener('scroll', handler);
-  });
+  }, []);
 
   return (
-    <header
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 50,
-        display: 'flex',
-        justifyContent: 'center',
-        padding: scrolled ? '0.6rem 1.5rem' : '0',
-        transition: 'padding 0.35s ease',
-        pointerEvents: 'none',
-      }}
-    >
-      {/* Full-width strip before scroll */}
-      {!scrolled && (
-        <div
+    <header className={`pub-header ${scrolled ? 'is-scrolled' : ''}`}>
+      {/* Full-width strip (always on mobile; hides on desktop when scrolled) */}
+      <div className={`pub-nav-bar ${scrolled ? 'is-scrolled hide-on-desktop-scroll' : ''}`}>
+        <nav
           style={{
-            width: '100%',
-            background: '#ffffff',
-            borderBottom: '1px solid #D6E4F0',
-            pointerEvents: 'auto',
+            maxWidth: 1200,
+            margin: '0 auto',
+            padding: '0 2rem',
+            height: 64,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
           }}
         >
-          <nav
-            style={{
-              maxWidth: 1200,
-              margin: '0 auto',
-              padding: '0 2rem',
-              height: 64,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <NavLink to="/" style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: '1.15rem', color: '#202A35', textDecoration: 'none', letterSpacing: '-0.02em' }}>
-              Esakki<span style={{ color: '#345474' }}>.</span>
-            </NavLink>
+          <NavLink to="/" style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: '1.15rem', color: '#202A35', textDecoration: 'none', letterSpacing: '-0.02em' }}>
+            Esakki<span style={{ color: '#345474' }}>.</span>
+          </NavLink>
 
-            <div className="pub-nav-links-desktop" style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
-              {NAV_LINKS.map(l => (
-                <NavLink
-                  key={l.to} to={l.to} end={l.end}
-                  style={({ isActive }) => ({
-                    position: 'relative', padding: '0.4rem 0.7rem', fontSize: '0.875rem',
-                    fontWeight: isActive ? 600 : 500,
-                    color: isActive ? '#345474' : '#6B7480', textDecoration: 'none', borderRadius: 6,
-                    transition: 'color 0.2s',
-                  })}
-                  className="pub-nav-link"
-                >
-                  {l.label}
-                </NavLink>
-              ))}
-            </div>
-
-            <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
-              <a href={personalInfo.resumeUrl} download style={{ padding: '0.38rem 0.85rem', fontSize: '0.85rem', fontWeight: 500, color: '#345474', border: '1px solid #345474', borderRadius: 6, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', transition: 'background 0.2s,color 0.2s' }}
-                className="pub-btn-ghost">
-                <FiDownload size={13} /> Resume
-              </a>
-              <NavLink to="/contact" style={{ padding: '0.38rem 0.85rem', fontSize: '0.85rem', fontWeight: 600, color: '#fff', background: '#345474', border: '1px solid #345474', borderRadius: 6, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', transition: 'background 0.2s' }}
-                className="pub-btn-solid">
-                Hire Me
+          <div className="pub-nav-links-desktop" style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
+            {NAV_LINKS.map(l => (
+              <NavLink
+                key={l.to} to={l.to} end={l.end}
+                style={({ isActive }) => ({
+                  position: 'relative', padding: '0.4rem 0.7rem', fontSize: '0.875rem',
+                  fontWeight: isActive ? 600 : 500,
+                  color: isActive ? '#345474' : '#6B7480', textDecoration: 'none', borderRadius: 6,
+                  transition: 'color 0.2s',
+                })}
+                className="pub-nav-link"
+              >
+                {l.label}
               </NavLink>
-            </div>
-          </nav>
-        </div>
-      )}
+            ))}
+          </div>
 
-      {/* Floating pill after scroll */}
+          <div className="pub-nav-actions-desktop" style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+            <a href={personalInfo.resumeUrl} download style={{ padding: '0.38rem 0.85rem', fontSize: '0.85rem', fontWeight: 500, color: '#345474', border: '1px solid #345474', borderRadius: 6, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', transition: 'background 0.2s,color 0.2s' }}
+              className="pub-btn-ghost">
+              <FiDownload size={13} /> Resume
+            </a>
+            <NavLink to="/contact" style={{ padding: '0.38rem 0.85rem', fontSize: '0.85rem', fontWeight: 600, color: '#fff', background: '#345474', border: '1px solid #345474', borderRadius: 6, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', transition: 'background 0.2s' }}
+              className="pub-btn-solid">
+              Hire Me
+            </NavLink>
+          </div>
+        </nav>
+      </div>
+
+      {/* Floating pill after scroll — strictly desktop/laptop only */}
       {scrolled && (
         <motion.div
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
+          className="pub-floating-nav"
           style={{
             background: '#ffffff',
             border: '1px solid #D6E4F0',
             borderRadius: 100,
             boxShadow: '0 4px 24px rgba(52,84,116,0.14)',
             padding: '0.45rem 1.25rem',
-            display: 'flex',
             alignItems: 'center',
             gap: '0.5rem',
             pointerEvents: 'auto',
@@ -156,12 +134,11 @@ function PublicNavbar() {
         </motion.div>
       )}
 
-      {/* Mobile menu button — always visible */}
+      {/* Mobile menu button */}
       <button
         onClick={() => setOpen(o => !o)}
         aria-label="Toggle menu"
         style={{
-          display: 'none', /* shown via CSS below */
           position: 'fixed', top: '1rem', right: '1rem',
           background: '#fff', border: '1px solid #D6E4F0',
           borderRadius: 8, padding: '0.4rem 0.5rem',
@@ -182,7 +159,7 @@ function PublicNavbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             style={{
-              position: 'fixed', top: '4rem', left: '1rem', right: '1rem',
+              position: 'fixed', top: '64px', left: '1rem', right: '1rem',
               background: '#fff', border: '1px solid #D6E4F0',
               borderRadius: 12, padding: '1rem',
               boxShadow: '0 8px 32px rgba(52,84,116,0.14)',

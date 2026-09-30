@@ -152,63 +152,50 @@ export default function Home() {
   return (
     <div className="hp-root">
       {/* ── NAVBAR ─────────────────────────────────────────────── */}
-      <header
-        style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0,
-          zIndex: 50,
-          display: 'flex',
-          justifyContent: 'center',
-          padding: scrolled ? '0.6rem 1.5rem' : '0',
-          transition: 'padding 0.35s ease',
-          pointerEvents: 'none',
-        }}
-      >
-        {/* ── Full-width bar (before scroll) ── */}
-        {!scrolled && (
-          <div style={{ width: '100%', background: '#ffffff', borderBottom: '1px solid #D6E4F0', pointerEvents: 'auto' }}>
-            <div className="hp-nav-inner">
-              <NavLink to="/" className="hp-nav-logo">Esakki<span>.</span></NavLink>
+      <header className={`hp-header ${scrolled ? 'is-scrolled' : ''}`}>
+        {/* ── Full-width bar (Always on mobile; hides on desktop when scrolled) ── */}
+        <div className={`hp-nav-bar ${scrolled ? 'is-scrolled hide-on-desktop-scroll' : ''}`}>
+          <div className="hp-nav-inner">
+            <NavLink to="/" className="hp-nav-logo">Esakki<span>.</span></NavLink>
 
-              <ul className="hp-nav-links">
-                {NAV_LINKS.map((l) => (
-                  <li key={l.to}>
-                    <NavLink to={l.to} end={l.end}
-                      className={({ isActive }) => `hp-nav-link${isActive ? ' active' : ''}`}>
-                      {l.label}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
+            <ul className="hp-nav-links">
+              {NAV_LINKS.map((l) => (
+                <li key={l.to}>
+                  <NavLink to={l.to} end={l.end}
+                    className={({ isActive }) => `hp-nav-link${isActive ? ' active' : ''}`}>
+                    {l.label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
 
-              <div className="hp-nav-actions">
-                <a href={personalInfo.resumeUrl} download id="nav-resume-download" className="hp-btn-ghost">
-                  <FiDownload size={13} /> Resume
-                </a>
-                <NavLink to="/contact" className="hp-btn-solid" id="nav-hire-me">Hire Me</NavLink>
-              </div>
-
-              <button className="hp-nav-hamburger" onClick={() => setMobileOpen(o => !o)}
-                aria-label="Toggle mobile menu" id="nav-mobile-toggle">
-                {mobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-              </button>
+            <div className="hp-nav-actions">
+              <a href={personalInfo.resumeUrl} download id="nav-resume-download" className="hp-btn-ghost">
+                <FiDownload size={13} /> Resume
+              </a>
+              <NavLink to="/contact" className="hp-btn-solid" id="nav-hire-me">Hire Me</NavLink>
             </div>
-          </div>
-        )}
 
-        {/* ── Floating pill (after scroll) ── */}
+            <button className="hp-nav-hamburger" onClick={() => setMobileOpen(o => !o)}
+              aria-label="Toggle mobile menu" id="nav-mobile-toggle">
+              {mobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+            </button>
+          </div>
+        </div>
+
+        {/* ── Floating pill (after scroll — strictly desktop/laptop only via .hp-floating-nav) ── */}
         {scrolled && (
           <motion.div
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
+            className="hp-floating-nav"
             style={{
               background: '#ffffff',
               border: '1px solid #D6E4F0',
               borderRadius: 100,
               boxShadow: '0 4px 24px rgba(52,84,116,0.14)',
               padding: '0.45rem 1.25rem',
-              display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
               pointerEvents: 'auto',
@@ -251,8 +238,6 @@ export default function Home() {
           </motion.div>
         )}
 
-
-
         {/* ── Mobile slide-down panel ── */}
         <AnimatePresence>
           {mobileOpen && (
@@ -261,12 +246,19 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               style={{
-                position: 'fixed', top: scrolled ? '4rem' : '64px',
-                left: '1rem', right: '1rem',
-                background: '#fff', border: '1px solid #D6E4F0',
-                borderRadius: 12, padding: '1rem',
+                position: 'fixed',
+                top: '64px',
+                left: '1rem',
+                right: '1rem',
+                background: '#fff',
+                border: '1px solid #D6E4F0',
+                borderRadius: 12,
+                padding: '1rem',
                 boxShadow: '0 8px 32px rgba(52,84,116,0.14)',
-                zIndex: 55, display: 'flex', flexDirection: 'column', gap: '0.2rem',
+                zIndex: 55,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.2rem',
                 pointerEvents: 'auto',
               }}
             >
