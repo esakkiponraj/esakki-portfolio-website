@@ -4,6 +4,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { PortfolioDataProvider } from './context/PortfolioDataContext';
 import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
+import ScrollToTop from './components/ScrollToTop';
 
 // Lazy-loaded public pages for fast initial bundle
 const About = lazy(() => import('./pages/About'));
@@ -51,60 +52,63 @@ function Protected({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <Routes>
-      {/* Public portfolio site */}
-      <Route
-        path="/*"
-        element={
-          <ThemeProvider>
-            <PortfolioDataProvider>
-              <MainLayout>
-                <Suspense fallback={<PageLoader />}>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/skills" element={<Skills />} />
-                    <Route path="/projects" element={<Projects />} />
-                    <Route path="/certificates" element={<Certificates />} />
-                    <Route path="/education" element={<Education />} />
-                    <Route path="/experience" element={<Experience />} />
-                    <Route path="/contact" element={<Contact />} />
-                  </Routes>
-                </Suspense>
-              </MainLayout>
-            </PortfolioDataProvider>
-          </ThemeProvider>
-        }
-      />
+    <>
+      <ScrollToTop />
+      <Routes>
+        {/* Public portfolio site */}
+        <Route
+          path="/*"
+          element={
+            <ThemeProvider>
+              <PortfolioDataProvider>
+                <MainLayout>
+                  <Suspense fallback={<PageLoader />}>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/about" element={<About />} />
+                      <Route path="/skills" element={<Skills />} />
+                      <Route path="/projects" element={<Projects />} />
+                      <Route path="/certificates" element={<Certificates />} />
+                      <Route path="/education" element={<Education />} />
+                      <Route path="/experience" element={<Experience />} />
+                      <Route path="/contact" element={<Contact />} />
+                    </Routes>
+                  </Suspense>
+                </MainLayout>
+              </PortfolioDataProvider>
+            </ThemeProvider>
+          }
+        />
 
-      {/* Admin CMS — Encrypted by AdminGatekeeper security gateway */}
-      <Route
-        path="/admin/*"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <AdminGatekeeper>
-              <AdminAuthProvider>
-                <Routes>
-                  <Route path="login" element={<Login />} />
-                  <Route path="" element={<Protected><Dashboard /></Protected>} />
-                  <Route path="profile" element={<Protected><ProfileEditor /></Protected>} />
-                  <Route path="projects" element={<Protected><ProjectsManager /></Protected>} />
-                  <Route path="skills" element={<Protected><SkillsManager /></Protected>} />
-                  <Route path="certificates" element={<Protected><CertificatesManager /></Protected>} />
-                  <Route path="education" element={<Protected><EducationManager /></Protected>} />
-                  <Route path="experience" element={<Protected><ExperienceManager /></Protected>} />
-                  <Route path="achievements" element={<Protected><AchievementsManager /></Protected>} />
-                  <Route path="social-links" element={<Protected><SocialLinksManager /></Protected>} />
-                  <Route path="contact-info" element={<Protected><ContactInfoEditor /></Protected>} />
-                  <Route path="messages" element={<Protected><MessagesManager /></Protected>} />
-                  <Route path="testimonials" element={<Protected><TestimonialsManager /></Protected>} />
-                  <Route path="blogs" element={<Protected><BlogsManager /></Protected>} />
-                </Routes>
-              </AdminAuthProvider>
-            </AdminGatekeeper>
-          </Suspense>
-        }
-      />
-    </Routes>
+        {/* Admin CMS — Encrypted by AdminGatekeeper security gateway */}
+        <Route
+          path="/admin/*"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <AdminGatekeeper>
+                <AdminAuthProvider>
+                  <Routes>
+                    <Route path="login" element={<Login />} />
+                    <Route path="" element={<Protected><Dashboard /></Protected>} />
+                    <Route path="profile" element={<Protected><ProfileEditor /></Protected>} />
+                    <Route path="projects" element={<Protected><ProjectsManager /></Protected>} />
+                    <Route path="skills" element={<Protected><SkillsManager /></Protected>} />
+                    <Route path="certificates" element={<Protected><CertificatesManager /></Protected>} />
+                    <Route path="education" element={<Protected><EducationManager /></Protected>} />
+                    <Route path="experience" element={<Protected><ExperienceManager /></Protected>} />
+                    <Route path="achievements" element={<Protected><AchievementsManager /></Protected>} />
+                    <Route path="social-links" element={<Protected><SocialLinksManager /></Protected>} />
+                    <Route path="contact-info" element={<Protected><ContactInfoEditor /></Protected>} />
+                    <Route path="messages" element={<Protected><MessagesManager /></Protected>} />
+                    <Route path="testimonials" element={<Protected><TestimonialsManager /></Protected>} />
+                    <Route path="blogs" element={<Protected><BlogsManager /></Protected>} />
+                  </Routes>
+                </AdminAuthProvider>
+              </AdminGatekeeper>
+            </Suspense>
+          }
+        />
+      </Routes>
+    </>
   );
 }

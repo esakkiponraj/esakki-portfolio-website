@@ -33,7 +33,7 @@ function PublicNavbar() {
   }, []);
 
   return (
-    <header className={`pub-header ${scrolled ? 'is-scrolled' : ''}`}>
+    <header className={`pub-nav-header ${scrolled ? 'is-scrolled' : ''}`}>
       {/* Full-width strip (always on mobile; hides on desktop when scrolled) */}
       <div className={`pub-nav-bar ${scrolled ? 'is-scrolled hide-on-desktop-scroll' : ''}`}>
         <nav
@@ -47,7 +47,11 @@ function PublicNavbar() {
             justifyContent: 'space-between',
           }}
         >
-          <NavLink to="/" style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: '1.15rem', color: '#202A35', textDecoration: 'none', letterSpacing: '-0.02em' }}>
+          <NavLink
+            to="/"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: '1.15rem', color: '#202A35', textDecoration: 'none', letterSpacing: '-0.02em' }}
+          >
             Esakki<span style={{ color: '#345474' }}>.</span>
           </NavLink>
 
@@ -55,6 +59,7 @@ function PublicNavbar() {
             {NAV_LINKS.map(l => (
               <NavLink
                 key={l.to} to={l.to} end={l.end}
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 style={({ isActive }) => ({
                   position: 'relative', padding: '0.4rem 0.7rem', fontSize: '0.875rem',
                   fontWeight: isActive ? 600 : 500,
@@ -114,6 +119,7 @@ function PublicNavbar() {
             {NAV_LINKS.map(l => (
               <NavLink
                 key={l.to} to={l.to} end={l.end}
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 style={({ isActive }) => ({
                   padding: '0.3rem 0.65rem', fontSize: '0.82rem', fontWeight: isActive ? 600 : 500,
                   color: isActive ? '#345474' : '#6B7480', textDecoration: 'none', borderRadius: 100,
@@ -179,7 +185,10 @@ function PublicNavbar() {
           >
             {NAV_LINKS.map(l => (
               <NavLink key={l.to} to={l.to} end={l.end}
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setOpen(false);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 style={({ isActive }) => ({
                   padding: '0.55rem 0.75rem', fontSize: '0.9rem', fontWeight: isActive ? 600 : 500,
                   color: isActive ? '#345474' : '#6B7480',
@@ -265,7 +274,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
   return (
     <div className="pub-page">
       <PublicNavbar />
-      <main style={{ paddingTop: 64 }}>
+      <main style={{ paddingTop: 76 }}>
         {children}
       </main>
       <PublicFooter />

@@ -163,6 +163,7 @@ export default function Home() {
               {NAV_LINKS.map((l) => (
                 <li key={l.to}>
                   <NavLink to={l.to} end={l.end}
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                     className={({ isActive }) => `hp-nav-link${isActive ? ' active' : ''}`}>
                     {l.label}
                   </NavLink>
@@ -217,6 +218,7 @@ export default function Home() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.1rem', flex: 1, justifyContent: 'center', flexWrap: 'wrap' }}>
               {NAV_LINKS.map((l) => (
                 <NavLink key={l.to} to={l.to} end={l.end}
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                   style={({ isActive }) => ({
                     padding: '0.3rem 0.65rem', fontSize: '0.82rem',
                     fontWeight: isActive ? 600 : 500,
@@ -275,7 +277,10 @@ export default function Home() {
             >
               {NAV_LINKS.map((l) => (
                 <NavLink key={l.to} to={l.to} end={l.end}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={() => {
+                    setMobileOpen(false);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   className={({ isActive }) => `hp-nav-mobile-link${isActive ? ' active' : ''}`}
                 >
                   {l.label}
