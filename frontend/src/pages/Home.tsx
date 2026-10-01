@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import { services } from '../data/profile';
 import { usePortfolioData } from '../context/PortfolioDataContext';
 import ProfilePhoto from '../components/ProfilePhoto';
+import { handleResumeDownload } from '../utils/downloadResume';
 
 /* ─── Typing effect ─────────────────────────────────────────── */
 function useTypingEffect(words: string[], speed = 80, pause = 1600) {
@@ -170,7 +171,13 @@ export default function Home() {
             </ul>
 
             <div className="hp-nav-actions">
-              <a href={personalInfo.resumeUrl} download id="nav-resume-download" className="hp-btn-ghost">
+              <a
+                href={personalInfo.resumeUrl}
+                download="Esakki_Ponraj_Resume.pdf"
+                onClick={(e) => handleResumeDownload(e, personalInfo.resumeUrl)}
+                id="nav-resume-download"
+                className="hp-btn-ghost"
+              >
                 <FiDownload size={13} /> Resume
               </a>
               <NavLink to="/contact" className="hp-btn-solid" id="nav-hire-me">Hire Me</NavLink>
@@ -226,8 +233,12 @@ export default function Home() {
             </div>
 
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.5rem' }}>
-              <a href={personalInfo.resumeUrl} download
-                style={{ padding: '0.32rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, color: '#345474', border: '1px solid #B8D0E8', borderRadius: 100, textDecoration: 'none', background: '#EDF3F9', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+              <a
+                href={personalInfo.resumeUrl}
+                download="Esakki_Ponraj_Resume.pdf"
+                onClick={(e) => handleResumeDownload(e, personalInfo.resumeUrl)}
+                style={{ padding: '0.32rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, color: '#345474', border: '1px solid #B8D0E8', borderRadius: 100, textDecoration: 'none', background: '#EDF3F9', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
+              >
                 <FiDownload size={11} /> Resume
               </a>
               <NavLink to="/contact"
@@ -270,9 +281,13 @@ export default function Home() {
                   {l.label}
                 </NavLink>
               ))}
-              <a href={personalInfo.resumeUrl} download
+              <a
+                href={personalInfo.resumeUrl}
+                download="Esakki_Ponraj_Resume.pdf"
+                onClick={(e) => handleResumeDownload(e, personalInfo.resumeUrl)}
                 className="hp-cta-secondary"
-                style={{ marginTop: '0.5rem', justifyContent: 'center' }}>
+                style={{ marginTop: '0.5rem', justifyContent: 'center' }}
+              >
                 <FiDownload size={13} /> Download Resume
               </a>
             </motion.div>
@@ -328,7 +343,8 @@ export default function Home() {
               </NavLink>
               <a
                 href={personalInfo.resumeUrl}
-                download
+                download="Esakki_Ponraj_Resume.pdf"
+                onClick={(e) => handleResumeDownload(e, personalInfo.resumeUrl)}
                 className="hp-cta-secondary"
                 id="hero-download-resume"
               >

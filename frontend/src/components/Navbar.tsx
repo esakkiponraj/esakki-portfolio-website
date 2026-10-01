@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiSun, FiMoon, FiMenu, FiX } from 'react-icons/fi';
 import { useTheme } from '../context/ThemeContext';
 import { usePortfolioData } from '../context/PortfolioDataContext';
+import { handleResumeDownload } from '../utils/downloadResume';
 
 const links = [
   { to: '/', label: 'Home' },
@@ -74,7 +75,12 @@ export default function Navbar({ onHireMe }: { onHireMe: () => void }) {
           >
             {theme === 'dark' ? <FiSun /> : <FiMoon />}
           </button>
-          <a href={personalInfo.resumeUrl} download className="btn-outline !px-4 !py-2 text-sm">
+          <a
+            href={personalInfo.resumeUrl}
+            download="Esakki_Ponraj_Resume.pdf"
+            onClick={(e) => handleResumeDownload(e, personalInfo.resumeUrl)}
+            className="btn-outline !px-4 !py-2 text-sm"
+          >
             Resume
           </a>
           <button onClick={onHireMe} className="btn-primary !px-4 !py-2 text-sm">

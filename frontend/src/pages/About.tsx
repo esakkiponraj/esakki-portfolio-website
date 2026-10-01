@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { FiArrowRight } from 'react-icons/fi';
 import ProfilePhoto from '../components/ProfilePhoto';
 import { usePortfolioData } from '../context/PortfolioDataContext';
+import { handleResumeDownload } from '../utils/downloadResume';
 
 const techStack = [
   'React', 'Next.js', 'Node.js', 'Express', 'MongoDB',
@@ -60,7 +61,12 @@ export default function About() {
               <NavLink to="/experience" className="hp-cta-primary" style={{ padding: '0.6rem 1.25rem', fontSize: '0.875rem', borderRadius: 8, background: '#345474', color: '#fff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600 }}>
                 View Experience <FiArrowRight size={13} />
               </NavLink>
-              <a href={personalInfo.resumeUrl} download style={{ padding: '0.6rem 1.25rem', fontSize: '0.875rem', borderRadius: 8, border: '1.5px solid #345474', color: '#345474', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600 }}>
+              <a
+                href={personalInfo.resumeUrl}
+                download="Esakki_Ponraj_Resume.pdf"
+                onClick={(e) => handleResumeDownload(e, personalInfo.resumeUrl)}
+                style={{ padding: '0.6rem 1.25rem', fontSize: '0.875rem', borderRadius: 8, border: '1.5px solid #345474', color: '#345474', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600 }}
+              >
                 Download Resume
               </a>
             </div>

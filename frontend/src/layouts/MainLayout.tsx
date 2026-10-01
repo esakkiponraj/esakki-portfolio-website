@@ -6,6 +6,7 @@ import HireMeModal from '../components/HireMeModal';
 import { FiDownload, FiGithub, FiLinkedin, FiMail, FiMenu, FiX } from 'react-icons/fi';
 import { usePortfolioData } from '../context/PortfolioDataContext';
 import { AnimatePresence, motion } from 'framer-motion';
+import { handleResumeDownload } from '../utils/downloadResume';
 import '../pages/public.css';
 
 const NAV_LINKS = [
@@ -68,8 +69,13 @@ function PublicNavbar() {
           </div>
 
           <div className="pub-nav-actions-desktop" style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
-            <a href={personalInfo.resumeUrl} download style={{ padding: '0.38rem 0.85rem', fontSize: '0.85rem', fontWeight: 500, color: '#345474', border: '1px solid #345474', borderRadius: 6, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', transition: 'background 0.2s,color 0.2s' }}
-              className="pub-btn-ghost">
+            <a
+              href={personalInfo.resumeUrl}
+              download="Esakki_Ponraj_Resume.pdf"
+              onClick={(e) => handleResumeDownload(e, personalInfo.resumeUrl)}
+              style={{ padding: '0.38rem 0.85rem', fontSize: '0.85rem', fontWeight: 500, color: '#345474', border: '1px solid #345474', borderRadius: 6, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', transition: 'background 0.2s,color 0.2s' }}
+              className="pub-btn-ghost"
+            >
               <FiDownload size={13} /> Resume
             </a>
             <NavLink to="/contact" style={{ padding: '0.38rem 0.85rem', fontSize: '0.85rem', fontWeight: 600, color: '#fff', background: '#345474', border: '1px solid #345474', borderRadius: 6, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', transition: 'background 0.2s' }}
@@ -122,8 +128,12 @@ function PublicNavbar() {
           </div>
 
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.5rem' }}>
-            <a href={personalInfo.resumeUrl} download
-              style={{ padding: '0.32rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, color: '#345474', border: '1px solid #B8D0E8', borderRadius: 100, textDecoration: 'none', background: '#EDF3F9', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+            <a
+              href={personalInfo.resumeUrl}
+              download="Esakki_Ponraj_Resume.pdf"
+              onClick={(e) => handleResumeDownload(e, personalInfo.resumeUrl)}
+              style={{ padding: '0.32rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, color: '#345474', border: '1px solid #B8D0E8', borderRadius: 100, textDecoration: 'none', background: '#EDF3F9', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
+            >
               <FiDownload size={11} /> Resume
             </a>
             <NavLink to="/contact"
@@ -180,8 +190,12 @@ function PublicNavbar() {
                 {l.label}
               </NavLink>
             ))}
-            <a href={personalInfo.resumeUrl} download
-              style={{ marginTop: '0.5rem', padding: '0.6rem', textAlign: 'center', fontSize: '0.875rem', fontWeight: 600, color: '#345474', border: '1.5px solid #345474', borderRadius: 8, textDecoration: 'none' }}>
+            <a
+              href={personalInfo.resumeUrl}
+              download="Esakki_Ponraj_Resume.pdf"
+              onClick={(e) => handleResumeDownload(e, personalInfo.resumeUrl)}
+              style={{ marginTop: '0.5rem', padding: '0.6rem', textAlign: 'center', fontSize: '0.875rem', fontWeight: 600, color: '#345474', border: '1.5px solid #345474', borderRadius: 8, textDecoration: 'none' }}
+            >
               <FiDownload size={13} style={{ display: 'inline', marginRight: 4 }} /> Download Resume
             </a>
           </motion.div>

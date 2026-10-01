@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { FiX, FiPhone, FiMail, FiMapPin, FiGithub, FiLinkedin, FiDownload } from 'react-icons/fi';
 import { usePortfolioData } from '../context/PortfolioDataContext';
+import { handleResumeDownload } from '../utils/downloadResume';
 
 export default function HireMeModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { personalInfo } = usePortfolioData();
@@ -51,7 +52,12 @@ export default function HireMeModal({ open, onClose }: { open: boolean; onClose:
               <a href={`tel:${personalInfo.phone}`} className="btn-outline flex-1 justify-center text-sm">
                 <FiPhone /> Call
               </a>
-              <a href={personalInfo.resumeUrl} download className="btn-outline flex-1 justify-center text-sm">
+              <a
+                href={personalInfo.resumeUrl}
+                download="Esakki_Ponraj_Resume.pdf"
+                onClick={(e) => handleResumeDownload(e, personalInfo.resumeUrl)}
+                className="btn-outline flex-1 justify-center text-sm"
+              >
                 <FiDownload /> Resume
               </a>
             </div>

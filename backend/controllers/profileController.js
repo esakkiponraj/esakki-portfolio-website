@@ -39,4 +39,36 @@ const updateProfile = asyncHandler(async (req, res) => {
   res.json({ success: true, data: profile });
 });
 
-module.exports = { getProfile, updateProfile };
+const path = require('path');
+const fs = require('fs');
+
+// GET /api/profile/resume — public download endpoint with forced PDF headers and proper filename
+const downloadResumeFile = asyncHandler(async (req, res) => {
+  const profile = await Profile.findOne().lean();
+  const resumeUrl = profile?.resumeUrl;
+  if (!resumeUrl) {
+    return res.status(404).send('Resume not found');
+  }
+
+  // If stored in Cloudinary or another remote CDN, fetch and stream with proper PDF headers
+  if (resumeUrl.startsWith('http://') || resumeUrl.startsWith('https://')) {
+    const fetchRes = await fetch(resumeUrl);
+    if (!fetchRes.ok) {
+      return res.status(fetchRes.status).send('Failed to fetch resume file');
+    }
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="Esakki_Ponraj_Resume.pdf"');
+    const arrayBuffer = await fetchRes.arrayBuffer();
+    return res.send(Buffer.from(arrayBuffer));
+  }
+
+  // Local file fallback
+  const filePath = path.join(__dirname, '..', resumeUrl.replace(/^\//, ''));
+  if (fs.existsSync(filePath)) {
+    return res.download(filePath, 'Esakki_Ponraj_Resume.pdf');
+  }
+
+  return res.redirect(resumeUrl);
+});
+
+module.exports = { getProfile, updateProfile, downloadResumeFile };
