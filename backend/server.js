@@ -29,15 +29,28 @@ const app = express();
 // --- CORS (must be the very first middleware so OPTIONS preflights
 //     are handled before any auth, rate-limiting, or other middleware
 //     has a chance to short-circuit the request) ---
-const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+
+// Known production frontend — always allowed regardless of CORS_ORIGIN env var.
+// Add any additional origins via CORS_ORIGIN in the Render / environment dashboard.
+const PRODUCTION_ORIGINS = [
+  'https://esakki-portfolio-website.vercel.app',
+];
+
+const envOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean)
   : [];
+
+// Merge: production origins first, then anything from env (deduped)
+const allowedOrigins = [
+  ...PRODUCTION_ORIGINS,
+  ...envOrigins.filter((o) => !PRODUCTION_ORIGINS.includes(o)),
+];
 
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (curl, Postman, server-to-server)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
     callback(new Error(`CORS: origin ${origin} not allowed`));

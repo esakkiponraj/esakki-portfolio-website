@@ -67,8 +67,7 @@ export default function Contact() {
           <hr className="pub-rule" />
         </motion.div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '2rem', alignItems: 'start' }}
-          className="pub-contact-layout">
+        <div className="pub-contact-layout">
           {/* Info column */}
           <motion.div
             initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}

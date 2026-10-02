@@ -92,11 +92,19 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 4rem 2rem 5rem;
+  /* Prevent any child from blowing out the viewport on mobile */
+  overflow-x: hidden;
 }
 .pub-container-narrow {
   max-width: 800px;
   margin: 0 auto;
   padding: 4rem 2rem 5rem;
+}
+@media (max-width: 480px) {
+  .pub-container,
+  .pub-container-narrow {
+    padding: 3rem 1rem 4rem;
+  }
 }
 
 /* ─── Page header (eyebrow + title + rule) ──────────────────── */
@@ -455,8 +463,51 @@
   color: #202A35;
   text-decoration: none;
   transition: color 0.2s;
+  /* Prevent long email addresses from overflowing the card */
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  min-width: 0;
 }
 .pub-contact-link:hover { color: #345474; }
+
+/* ─── CONTACT PAGE TWO-COLUMN LAYOUT ────────────────────────── */
+/* Desktop: info left, form right */
+.pub-contact-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 2rem;
+  align-items: start;
+}
+/* Stack on anything narrower than a comfortable two-column layout */
+@media (max-width: 768px) {
+  .pub-contact-layout {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+  /* On mobile the form card shouldn't have fixed interior padding */
+  .pub-form {
+    padding: 1.25rem;
+  }
+  /* Make inputs / textareas span the full available width */
+  .pub-input {
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+  /* Make the submit button full-width and a comfortable touch target */
+  .pub-submit {
+    width: 100%;
+    min-height: 44px;
+  }
+  /* Prevent contact info card from adding horizontal overflow */
+  .pub-contact-info {
+    box-sizing: border-box;
+    width: 100%;
+  }
+  /* Social link buttons should wrap and stay within bounds */
+  .pub-contact-layout > div:first-child > div[style] {
+    flex-wrap: wrap;
+  }
+}
 
 /* ─── CERT FILE ─────────────────────────────────────────────── */
 .pub-cert-img-link {

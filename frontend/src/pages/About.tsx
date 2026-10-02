@@ -12,7 +12,7 @@ const techStack = [
 ];
 
 export default function About() {
-  const { personalInfo, stats } = usePortfolioData();
+  const { personalInfo, stats, photoReady } = usePortfolioData();
 
   return (
     <div className="pub-page">
@@ -35,7 +35,7 @@ export default function About() {
             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.55 }}
           >
-            <ProfilePhoto src={personalInfo.photo} alt={personalInfo.name} className="w-full" />
+            <ProfilePhoto src={personalInfo.photo} alt={personalInfo.name} className="w-full" loading={!photoReady} />
           </motion.div>
 
           <motion.div

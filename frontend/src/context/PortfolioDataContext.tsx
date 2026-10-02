@@ -29,6 +29,7 @@ interface PortfolioData {
   achievements: typeof staticAchievements;
   loading: boolean;
   isLive: boolean; // true once at least the profile loaded from the backend
+  photoReady: boolean; // true once the live API profile fetch has settled (success or fail)
   refetch: () => void;
 }
 
@@ -70,6 +71,9 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
   const [achievements, setAchievements] = useState(cached?.achievements || staticAchievements);
   const [loading, setLoading] = useState(!cached);
   const [isLive, setIsLive] = useState(!!cached?.isLive);
+  // photoReady is false until the live API profile fetch settles for the current session.
+  // This prevents showing a stale cached/static photo for 1-2s before the live photo arrives.
+  const [photoReady, setPhotoReady] = useState(false);
 
   const loadAll = useCallback(async () => {
 
@@ -125,6 +129,8 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
         socials,
       });
     }
+    // Mark photo as confirmed from the live API — skeleton can now be hidden
+    setPhotoReady(true);
 
     const [
       projectsRes, skillsRes, educationRes, experienceRes, achievementsRes, certificatesRes,
@@ -248,7 +254,7 @@ export function PortfolioDataProvider({ children }: { children: ReactNode }) {
     <PortfolioDataContext.Provider
       value={{
         personalInfo, stats, education, experience, projects,
-        skillCategories, certificates, achievements, loading, isLive, refetch: loadAll,
+        skillCategories, certificates, achievements, loading, isLive, photoReady, refetch: loadAll,
       }}
     >
       {children}

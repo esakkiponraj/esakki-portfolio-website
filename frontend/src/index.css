@@ -24,6 +24,9 @@ body {
   color: rgb(var(--color-fg));
   font-family: 'Inter', sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
+  /* Prevent the dark body background from showing as a right-edge strip
+     when a child element overflows the viewport horizontally on mobile */
+  overflow-x: hidden;
 }
 
 ::-webkit-scrollbar {
