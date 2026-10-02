@@ -54,8 +54,7 @@
   }
 }
 
-.pub-nav-links-desktop { }
-.pub-nav-actions-desktop { }
+
 .pub-hamburger { display: none !important; }
 .pub-nav-link:hover { color: #345474 !important; background: #EDF3F9; }
 .pub-btn-ghost:hover { background: #345474 !important; color: #fff !important; }

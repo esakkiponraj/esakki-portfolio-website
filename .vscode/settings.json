@@ -1,0 +1,19 @@
+{
+  // Disable the built-in CSS validator so it does not flag Tailwind-specific
+  // at-rules (@tailwind, @apply, @layer) as unknown. The Tailwind CSS
+  // IntelliSense extension provides validation and autocompletion instead.
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false,
+
+  // Tell the editor to treat .css files with Tailwind-aware IntelliSense
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+
+  // Workspace-level file associations — keeps Tailwind .css files linted
+  // by Tailwind IntelliSense rather than the built-in validator
+  "files.associations": {
+    "*.css": "css"
+  }
+}
