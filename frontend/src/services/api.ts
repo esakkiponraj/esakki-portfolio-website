@@ -8,6 +8,9 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 export const api = axios.create({
   baseURL: API_BASE,
   headers: { 'Content-Type': 'application/json' },
+  // 15 second timeout — ensures the UI never hangs forever if the backend
+  // is cold-starting (e.g. Render free tier sleep) or the network drops.
+  timeout: 15000,
 });
 
 // Media URLs coming from the CMS are normally absolute Cloudinary URLs.

@@ -44,7 +44,10 @@ export default function Contact() {
       setSent(true);
       setTimeout(() => setSent(false), 4000);
     } catch (err: any) {
-      const msg = err?.response?.data?.message || 'Could not send message right now. Please email me directly.';
+      const isTimeout = err?.code === 'ECONNABORTED' || err?.message?.toLowerCase().includes('timeout');
+      const msg = isTimeout
+        ? 'Request timed out. The server may be starting up — please try again in a moment.'
+        : err?.response?.data?.message || 'Could not send message right now. Please email me directly.';
       toast.error(msg);
     } finally {
       setLoading(false);

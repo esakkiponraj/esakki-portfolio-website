@@ -6,14 +6,14 @@ import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
 import ScrollToTop from './components/ScrollToTop';
 
-// Lazy-loaded public pages for fast initial bundle
-const About = lazy(() => import('./pages/About'));
-const Skills = lazy(() => import('./pages/Skills'));
-const Projects = lazy(() => import('./pages/Projects'));
-const Certificates = lazy(() => import('./pages/Certificates'));
-const Education = lazy(() => import('./pages/Education'));
-const Experience = lazy(() => import('./pages/Experience'));
-const Contact = lazy(() => import('./pages/Contact'));
+// Public pages — statically imported so navbar navigation is instant (no chunk fetch, no spinner)
+import About from './pages/About';
+import Skills from './pages/Skills';
+import Projects from './pages/Projects';
+import Certificates from './pages/Certificates';
+import Education from './pages/Education';
+import Experience from './pages/Experience';
+import Contact from './pages/Contact';
 
 // Lazy-loaded Admin CMS pages — keeps the public site ultra-lightweight
 const AdminGatekeeper = lazy(() => import('./admin/components/AdminGatekeeper'));
